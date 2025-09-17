@@ -29,27 +29,27 @@ def generate_caption():
     if not data or 'topic' not in data:
         return jsonify({"error": "Topic is required"}), 400
 
-    # Παίρνουμε όλες τις νέες παραμέτρους από το frontend
+    # Λαμβάνουμε όλες τις παραμέτρους από το frontend
     topic = data.get('topic')
     platform = data.get('platform', 'Instagram')
     tone = data.get('tone', 'Friendly')
-    content_type = data.get('contentType', 'Caption') # Παίρνουμε τον τύπο περιεχομένου
+    content_type = data.get('contentType', 'Caption')
+    language = data.get('language', 'Greek') # Λαμβάνουμε τη γλώσσα
 
-    # Λεξικό για να μεταφράσουμε την επιλογή σε κείμενο για το AI
     content_map = {
         'Caption': 'a full caption (including a hook, body, and CTA)',
         'Hook': 'only a compelling hook (the opening line)',
         'CTA': 'only a strong call-to-action (CTA)'
     }
     
-    # Παίρνουμε τη σωστή φράση από το λεξικό
     requested_content = content_map.get(content_type, 'a full caption')
 
-    # Δυναμικό prompt που αλλάζει ανάλογα με τις επιλογές του χρήστη
+    # ## ΕΝΗΜΕΡΩΜΕΝΟ PROMPT ΠΟΥ ΠΕΡΙΛΑΜΒΑΝΕΙ ΤΗ ΓΛΩΣΣΑ ##
     prompt = f"""
     Generate 3 distinct and creative options for {requested_content} for a {platform} post.
     The topic is: '{topic}'.
     The desired tone is: {tone}.
+    IMPORTANT: The output language must be strictly {language}.
 
     Structure the output as a numbered list. For example:
     1. [First option here with relevant hashtags if applicable]

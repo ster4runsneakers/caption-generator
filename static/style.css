@@ -1,113 +1,35 @@
-/* --- Γενικό Στυλ & Background --- */
-body {
-    font-family: 'Poppins', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-    background: linear-gradient(110deg, #f0f4f8, #d9e2ec);
-    color: #333;
+/* --- Στυλ για το Spinner (Ένδειξη Φόρτωσης) --- */
+.spinner-container {
+    display: none; /* Κρυφό από προεπιλογή */
+    position: relative;
+    width: 100%;
+    min-height: 150px; /* Ίδιο ύψος με τις κάρτες για να μην "πηδάει" η σελίδα */
     display: flex;
     justify-content: center;
-    align-items: flex-start; /* Αλλαγή σε flex-start για να μην είναι κολλημένο στο κέντρο */
-    min-height: 100vh;
-    padding-top: 50px; /* Προσθήκη padding πάνω */
-    margin: 0;
+    align-items: center;
 }
 
-/* --- Κεντρικό Container --- */
-.container {
-    background-color: white;
-    padding: 40px;
-    border-radius: 16px;
-    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
-    width: 90%;
-    max-width: 700px;
-    text-align: center;
-    border: 1px solid rgba(255, 255, 255, 0.2);
+.spinner {
+    border: 6px solid #f3f3f3; /* Ανοιχτό γκρι κύκλος */
+    border-top: 6px solid #3498db; /* Μπλε χρώμα για την κίνηση */
+    border-radius: 50%;
+    width: 50px;
+    height: 50px;
+    animation: spin 1s linear infinite; /* Animation */
 }
 
-h1 {
-    color: #2c3e50;
-    font-weight: 600;
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
 }
 
-p {
-    color: #7f8c8d;
-    margin-bottom: 30px;
-}
-
-/* --- Στυλ για τα πεδία εισαγωγής --- */
-input[type="text"], select {
-    width: 100%;
-    padding: 12px 15px;
-    margin-bottom: 20px;
-    border: 1px solid #dfe6e9;
-    border-radius: 8px;
-    font-size: 16px;
-    box-sizing: border-box; /* Διασφαλίζει ότι το padding δεν αλλάζει το πλάτος */
-    background-color: #f8fafc;
-    transition: border-color 0.3s, box-shadow 0.3s;
-}
-
-input[type="text"]:focus, select:focus {
-    outline: none;
-    border-color: #3498db;
-    box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.2);
-}
-
-/* --- Στυλ για το κεντρικό κουμπί --- */
-button#generate-btn {
-    background: linear-gradient(45deg, #3498db, #2980b9);
-    color: white;
-    border: none;
-    padding: 14px 28px;
-    border-radius: 8px;
-    font-size: 16px;
-    font-weight: 600;
-    cursor: pointer;
-    transition: transform 0.2s, box-shadow 0.2s;
-    width: 100%;
-    margin-top: 10px;
-}
-
-button#generate-btn:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 6px 20px rgba(52, 152, 219, 0.3);
-}
-
-/* --- Περιοχή Αποτελεσμάτων --- */
-#results-container {
-    margin-top: 30px;
+/* --- Στυλ για τον τίτλο του ιστορικού --- */
+h2.history-title {
     text-align: left;
-}
-
-/* --- Στυλ για κάθε κάρτα αποτελέσματος --- */
-.result-card {
-    background-color: #f8fafc;
-    border: 1px solid #e2e8f0;
-    border-radius: 12px;
-    padding: 20px;
-    margin-bottom: 15px;
-    position: relative; /* Απαραίτητο για το κουμπί αντιγραφής */
-    line-height: 1.6;
-    white-space: pre-wrap;
-    font-size: 15px;
-}
-
-/* --- Στυλ για το κουμπί Αντιγραφής --- */
-.copy-btn {
-    position: absolute;
-    top: 15px;
-    right: 15px;
-    background-color: #dbe4ee;
-    color: #556a81;
-    border: none;
-    border-radius: 6px;
-    padding: 6px 12px;
-    font-size: 12px;
-    font-weight: 600;
-    cursor: pointer;
-    transition: background-color 0.3s, color 0.3s;
-}
-
-.copy-btn:hover {
-    background-color: #3498db;
-    color: white;
+    color: #2c3e50;
+    margin-top: 40px;
+    margin-bottom: 10px;
+    font-size: 18px;
+    border-bottom: 2px solid #e2e8f0;
+    padding-bottom: 5px;
 }
