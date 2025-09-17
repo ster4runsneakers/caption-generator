@@ -9,8 +9,8 @@
 <body>
 
     <div class="container">
-        <h1>Δημιουργός Caption</h1>
-        <p>Συμπλήρωσε τις επιλογές για να δημιουργήσεις το τέλειο caption!</p>
+        <h1>AI Social Media Assistant</h1>
+        <p>Συμπλήρωσε τις επιλογές για να δημιουργήσεις το τέλειο περιεχόμενο!</p>
 
         <input type="text" id="topic-input" placeholder="π.χ., ένα ηλιόλουστο πρωινό στην παραλία">
 
@@ -18,7 +18,14 @@
             <option value="Instagram">Instagram</option>
             <option value="TikTok">TikTok</option>
             <option value="Facebook">Facebook</option>
+            <option value="Pinterest">Pinterest</option>
             <option value="YouTube">YouTube</option>
+        </select>
+        
+        <select id="content-type-select">
+            <option value="Caption">Full Caption (3 επιλογές)</option>
+            <option value="Hook">Μόνο Hook (3 επιλογές)</option>
+            <option value="CTA">Μόνο CTA (3 επιλογές)</option>
         </select>
 
         <select id="tone-select">
@@ -28,12 +35,14 @@
             <option value="Enthusiastic">Ενθουσιώδες</option>
         </select>
 
-        <button id="generate-btn">Δημιουργία 3 Captions</button>
+        <button id="generate-btn">Δημιουργία Περιεχομένου</button>
 
-        <pre id="caption-output">Τα captions σου θα εμφανιστούν εδώ...</pre>
+        <pre id="caption-output">Το περιεχόμενό σου θα εμφανιστεί εδώ...</pre>
     </div>
 
     <script>
+        // Παίρνουμε και το νέο select element
+        const contentTypeSelect = document.getElementById('content-type-select');
         const topicInput = document.getElementById('topic-input');
         const platformSelect = document.getElementById('platform-select');
         const toneSelect = document.getElementById('tone-select');
@@ -44,6 +53,8 @@
             const topic = topicInput.value;
             const platform = platformSelect.value;
             const tone = toneSelect.value;
+            // Παίρνουμε την τιμή και από το νέο dropdown
+            const contentType = contentTypeSelect.value;
 
             if (!topic) {
                 alert('Παρακαλώ, γράψε ένα θέμα!');
@@ -52,17 +63,17 @@
 
             captionOutput.textContent = 'Δημιουργία...';
 
-            // The JavaScript doesn't need the full Render URL anymore.
-            // It can just call the local API endpoint directly.
             fetch('/generate-caption', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
                 },
+                // Στέλνουμε όλες τις τιμές στο backend
                 body: JSON.stringify({
                     topic: topic,
                     platform: platform,
-                    tone: tone
+                    tone: tone,
+                    contentType: contentType 
                 })
             })
             .then(response => response.json())

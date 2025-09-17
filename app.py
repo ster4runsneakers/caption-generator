@@ -4,26 +4,21 @@ from openai import OpenAI
 from dotenv import load_dotenv
 from flask_cors import CORS
 
-# Load environment variables from .env file
 load_dotenv()
 
-# Create the Flask application
 app = Flask(__name__)
 CORS(app) 
 
-# Initialize the OpenAI client
 try:
     client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
 except Exception as e:
     print(f"Error initializing OpenAI client: {e}")
     client = None
 
-# Route to serve the main HTML page
 @app.route('/')
 def index():
     return render_template('index.html')
 
-# API endpoint for generating captions
 @app.route('/generate-caption', methods=['POST'])
 def generate_caption():
     if not client:
@@ -34,20 +29,32 @@ def generate_caption():
     if not data or 'topic' not in data:
         return jsonify({"error": "Topic is required"}), 400
 
+    # Παίρνουμε όλες τις νέες παραμέτρους από το frontend
     topic = data.get('topic')
     platform = data.get('platform', 'Instagram')
     tone = data.get('tone', 'Friendly')
+    content_type = data.get('contentType', 'Caption') # Παίρνουμε τον τύπο περιεχομένου
 
-    # New, smarter prompt
+    # Λεξικό για να μεταφράσουμε την επιλογή σε κείμενο για το AI
+    content_map = {
+        'Caption': 'a full caption (including a hook, body, and CTA)',
+        'Hook': 'only a compelling hook (the opening line)',
+        'CTA': 'only a strong call-to-action (CTA)'
+    }
+    
+    # Παίρνουμε τη σωστή φράση από το λεξικό
+    requested_content = content_map.get(content_type, 'a full caption')
+
+    # Δυναμικό prompt που αλλάζει ανάλογα με τις επιλογές του χρήστη
     prompt = f"""
-    Generate 3 distinct, creative, and engaging captions for a {platform} post.
+    Generate 3 distinct and creative options for {requested_content} for a {platform} post.
     The topic is: '{topic}'.
     The desired tone is: {tone}.
-    
-    Please structure the output clearly, for example:
-    1. [First caption here with relevant hashtags]
-    2. [Second caption here with relevant hashtags]
-    3. [Third caption here with relevant hashtags]
+
+    Structure the output as a numbered list. For example:
+    1. [First option here with relevant hashtags if applicable]
+    2. [Second option here with relevant hashtags if applicable]
+    3. [Third option here with relevant hashtags if applicable]
     """
 
     try:
@@ -67,6 +74,5 @@ def generate_caption():
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 
-# Start the server when the script is run
 if __name__ == '__main__':
     app.run(debug=True)
