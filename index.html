@@ -94,7 +94,7 @@
             captionOutput.textContent = 'Δημιουργία...';
 
             // Χρησιμοποιούμε τη συνάρτηση fetch για να στείλουμε το αίτημα στο backend μας
-            fetch('http://127.0.0.1:5000/generate-caption', {
+            fetch('https://caption-generator-app.onrender.com', { ... })
                 method: 'POST', // Η μέθοδος πρέπει να είναι POST
                 headers: {
                     'Content-Type': 'application/json' // Λέμε στο backend ότι στέλνουμε JSON
