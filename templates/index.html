@@ -37,6 +37,11 @@
             <option value="Funny">Αστείο</option>
             <option value="Enthusiastic">Ενθουσιώδες</option>
         </select>
+        
+        <select id="language-select">
+            <option value="Greek">Ελληνικά</option>
+            <option value="English">Αγγλικά</option>
+        </select>
 
         <button id="generate-btn">Δημιουργία Περιεχομένου</button>
 
@@ -54,44 +59,33 @@
         const platformSelect = document.getElementById('platform-select');
         const contentTypeSelect = document.getElementById('content-type-select');
         const toneSelect = document.getElementById('tone-select');
+        const languageSelect = document.getElementById('language-select'); // Νέο select
         const generateBtn = document.getElementById('generate-btn');
         const resultsContainer = document.getElementById('results-container');
         const spinnerContainer = document.getElementById('spinner-container');
 
-        // --- Core Functions ---
-
-        /**
-         * Δημιουργεί τις κάρτες αποτελεσμάτων και τις προσθέτει στη σελίδα
-         * @param {Array<string>} captions - Ένας πίνακας με τα κείμενα προς εμφάνιση
-         */
+        // ... (Οι συναρτήσεις createResultCards, loadHistory, saveToHistory παραμένουν ίδιες) ...
+        
         function createResultCards(captions) {
             captions.forEach(captionText => {
                 const card = document.createElement('div');
                 card.className = 'result-card';
-                
                 const text = document.createElement('span');
                 text.textContent = captionText.trim();
-                
                 const copyBtn = document.createElement('button');
                 copyBtn.className = 'copy-btn';
                 copyBtn.textContent = 'Αντιγραφή';
-                
                 copyBtn.onclick = () => {
                     navigator.clipboard.writeText(text.textContent).then(() => {
                         copyBtn.textContent = 'Αντιγράφηκε!';
                         setTimeout(() => { copyBtn.textContent = 'Αντιγραφή'; }, 2000);
                     });
                 };
-                
                 card.appendChild(text);
                 card.appendChild(copyBtn);
-                resultsContainer.prepend(card); // .prepend() για να μπαίνουν τα νέα πάνω-πάνω
+                resultsContainer.prepend(card);
             });
         }
-
-        /**
-         * Φορτώνει το ιστορικό από το Local Storage και το εμφανίζει
-         */
         function loadHistory() {
             const history = JSON.parse(localStorage.getItem('captionHistory')) || [];
             if (history.length > 0) {
@@ -102,22 +96,14 @@
                 createResultCards(history);
             }
         }
-
-        /**
-         * Αποθηκεύει τα νέα αποτελέσματα στο Local Storage
-         * @param {Array<string>} newCaptions - Τα νέα κείμενα για αποθήκευση
-         */
         function saveToHistory(newCaptions) {
             let history = JSON.parse(localStorage.getItem('captionHistory')) || [];
-            // Προσθέτουμε τα νέα αποτελέσματα στην αρχή του ιστορικού
             history = [...newCaptions, ...history];
-            // Περιορίζουμε το ιστορικό στα τελευταία 30 αποτελέσματα για να μην γεμίζει
             if (history.length > 30) {
                 history = history.slice(0, 30);
             }
             localStorage.setItem('captionHistory', JSON.stringify(history));
         }
-
 
         // --- Event Listener ---
         generateBtn.addEventListener('click', () => {
@@ -127,42 +113,41 @@
                 return;
             }
 
-            // Εμφάνιση Spinner, απόκρυψη παλιών αποτελεσμάτων
             spinnerContainer.style.display = 'flex';
             resultsContainer.innerHTML = ''; 
 
             const platform = platformSelect.value;
             const tone = toneSelect.value;
             const contentType = contentTypeSelect.value;
+            const language = languageSelect.value; // Παίρνουμε τη γλώσσα
 
             fetch('/generate-caption', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ topic, platform, tone, contentType })
+                // Στέλνουμε τη νέα παράμετρο στο backend
+                body: JSON.stringify({ topic, platform, tone, contentType, language })
             })
             .then(response => response.json())
             .then(data => {
-                spinnerContainer.style.display = 'none'; // Απόκρυψη Spinner
+                spinnerContainer.style.display = 'none';
 
                 if (data.caption) {
                     const newCaptions = data.caption.split(/\d+\./).filter(item => item.trim() !== '');
                     saveToHistory(newCaptions);
-                    loadHistory(); // Εμφανίζουμε το πλήρες, ενημερωμένο ιστορικό
+                    loadHistory();
                 } else {
                     resultsContainer.innerHTML = `<div class="result-card">${data.error || 'Άγνωστο σφάλμα'}</div>`;
                 }
             })
             .catch(error => {
-                spinnerContainer.style.display = 'none'; // Απόκρυψη Spinner
+                spinnerContainer.style.display = 'none';
                 console.error('Error:', error);
                 resultsContainer.innerHTML = '<div class="result-card">Παρουσιάστηκε σφάλμα δικτύου.</div>';
             });
         });
 
         // --- Initial Load ---
-        // Φορτώνουμε το ιστορικό μόλις ανοίξει η σελίδα
         document.addEventListener('DOMContentLoaded', loadHistory);
-
     </script>
 
 </body>
