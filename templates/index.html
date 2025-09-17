@@ -12,11 +12,14 @@
 <body>
 
     <div class="container">
+        <div class="theme-switch" id="theme-switch" title="Toggle dark mode">🌙</div>
         <h1>AI Social Media Assistant</h1>
         <p>Δημιούργησε Hooks, CTAs και Captions για τα social media σου σε δευτερόλεπτα.</p>
 
         <div class="form-controls">
-            <input type="text" id="topic-input" placeholder="π.χ., ένα ηλιόλουστο πρωινό στην παραλία">
+            <input type="text" id="topic-input" placeholder="Κύριο θέμα...">
+            <input type="text" id="keywords" placeholder="Λέξεις-κλειδιά (π.χ. προσφορά, νέο)...">
+            
             <select id="platform-select">
                 <option value="Instagram">Instagram</option>
                 <option value="TikTok">TikTok</option>
@@ -24,17 +27,19 @@
                 <option value="Pinterest">Pinterest</option>
                 <option value="YouTube">YouTube</option>
             </select>
+            
             <select id="content-type-select">
-                <option value="Caption">Full Caption (3 επιλογές)</option>
-                <option value="Hook">Μόνο Hook (3 επιλογές)</option>
-                <option value="CTA">Μόνο CTA (3 επιλογές)</option>
+                <option value="Caption">Full Caption</option>
+                <option value="Hook">Μόνο Hook</option>
+                <option value="CTA">Μόνο CTA</option>
+                <option value="Hashtags">Μόνο Hashtags</option>
             </select>
+
             <select id="tone-select">
                 <option value="Friendly">Φιλικό</option>
                 <option value="Professional">Επαγγελματικό</option>
-                <option value="Funny">Αστείο</option>
-                <option value="Enthusiastic">Ενθουσιώδες</option>
             </select>
+
             <select id="language-select">
                 <option value="Greek">Ελληνικά</option>
                 <option value="English">Αγγλικά</option>
@@ -46,101 +51,181 @@
         <div id="spinner-container" class="spinner-container">
             <div class="spinner"></div>
         </div>
-
-        <div id="results-container">
+        
+        <div class="history-controls">
+            <div class="tabs">
+                <button id="tab-history" class="active">Ιστορικό</button>
+                <button id="tab-favorites">Αγαπημένα</button>
             </div>
+            <input type="text" id="search-history" placeholder="Αναζήτηση...">
+        </div>
+
+        <div id="results-container"></div>
     </div>
 
     <script>
-        // --- DOM Elements ---
-        const topicInput = document.getElementById('topic-input');
-        const platformSelect = document.getElementById('platform-select');
-        const contentTypeSelect = document.getElementById('content-type-select');
-        const toneSelect = document.getElementById('tone-select');
-        const languageSelect = document.getElementById('language-select');
-        const generateBtn = document.getElementById('generate-btn');
-        const resultsContainer = document.getElementById('results-container');
-        const spinnerContainer = document.getElementById('spinner-container');
+    // --- DOM Elements ---
+    const generateBtn = document.getElementById('generate-btn');
+    const resultsContainer = document.getElementById('results-container');
+    const spinnerContainer = document.getElementById('spinner-container');
+    const themeSwitch = document.getElementById('theme-switch');
+    const searchInput = document.getElementById('search-history');
+    const historyTab = document.getElementById('tab-history');
+    const favoritesTab = document.getElementById('tab-favorites');
 
-        // --- Core Functions ---
-        function createResultCards(captions) {
-            captions.forEach(captionText => {
-                const card = document.createElement('div');
-                card.className = 'result-card';
-                const text = document.createElement('span');
-                text.textContent = captionText.trim();
-                const copyBtn = document.createElement('button');
-                copyBtn.className = 'copy-btn';
-                copyBtn.textContent = 'Αντιγραφή';
-                copyBtn.onclick = () => {
-                    navigator.clipboard.writeText(text.textContent).then(() => {
-                        copyBtn.textContent = 'Αντιγράφηκε!';
-                        setTimeout(() => { copyBtn.textContent = 'Αντιγραφή'; }, 2000);
-                    });
-                };
-                card.appendChild(text);
-                card.appendChild(copyBtn);
-                resultsContainer.prepend(card);
-            });
-        }
-        function loadHistory() {
-            const history = JSON.parse(localStorage.getItem('captionHistory')) || [];
-            if (history.length > 0) {
-                const title = document.createElement('h2');
-                title.className = 'history-title';
-                title.textContent = 'Πρόσφατα Αποτελέσματα';
-                resultsContainer.appendChild(title);
-                createResultCards(history);
-            }
-        }
-        function saveToHistory(newCaptions) {
-            let history = JSON.parse(localStorage.getItem('captionHistory')) || [];
-            history = [...newCaptions, ...history];
-            if (history.length > 30) {
-                history = history.slice(0, 30);
-            }
-            localStorage.setItem('captionHistory', JSON.stringify(history));
-        }
+    let currentView = 'history'; // 'history' or 'favorites'
 
-        // --- Event Listener ---
-        generateBtn.addEventListener('click', () => {
-            const topic = topicInput.value;
-            if (!topic) {
-                alert('Παρακαλώ, γράψε ένα θέμα!');
-                return;
-            }
-            spinnerContainer.style.display = 'flex';
-            resultsContainer.innerHTML = '';
-            const platform = platformSelect.value;
-            const tone = toneSelect.value;
-            const contentType = contentTypeSelect.value;
-            const language = languageSelect.value;
-            fetch('/generate-caption', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ topic, platform, tone, contentType, language })
-            })
-            .then(response => response.json())
-            .then(data => {
-                spinnerContainer.style.display = 'none';
-                if (data.caption) {
-                    const newCaptions = data.caption.split(/\d+\./).filter(item => item.trim() !== '');
-                    saveToHistory(newCaptions);
-                    loadHistory();
-                } else {
-                    resultsContainer.innerHTML = `<div class="result-card">${data.error || 'Άγνωστο σφάλμα'}</div>`;
-                }
-            })
-            .catch(error => {
-                spinnerContainer.style.display = 'none';
-                console.error('Error:', error);
-                resultsContainer.innerHTML = '<div class="result-card">Παρουσιάστηκε σφάλμα δικτύου.</div>';
-            });
-        });
+    // --- Core Functions ---
+    const getStorage = (key) => JSON.parse(localStorage.getItem(key)) || [];
+    const setStorage = (key, value) => localStorage.setItem(key, JSON.stringify(value));
+
+    function createResultCard(captionText, isFavorite) {
+        const card = document.createElement('div');
+        card.className = 'result-card';
         
-        // --- Initial Load ---
-        document.addEventListener('DOMContentLoaded', loadHistory);
-    </script>
+        const textSpan = document.createElement('span');
+        textSpan.textContent = captionText.trim();
+        
+        const actionsDiv = document.createElement('div');
+        actionsDiv.className = 'card-actions';
 
+        const copyBtn = document.createElement('button');
+        copyBtn.className = 'copy-btn';
+        copyBtn.innerHTML = '📋';
+        copyBtn.title = 'Copy';
+        copyBtn.onclick = () => {
+            navigator.clipboard.writeText(textSpan.textContent);
+            copyBtn.innerHTML = '✅';
+            setTimeout(() => { copyBtn.innerHTML = '📋'; }, 2000);
+        };
+
+        const favBtn = document.createElement('button');
+        favBtn.className = `fav-btn ${isFavorite ? 'favorited' : ''}`;
+        favBtn.innerHTML = isFavorite ? '⭐' : '☆';
+        favBtn.title = 'Favorite';
+        favBtn.onclick = () => toggleFavorite(captionText, favBtn);
+
+        actionsDiv.appendChild(copyBtn);
+        actionsDiv.appendChild(favBtn);
+        card.appendChild(textSpan);
+        card.appendChild(actionsDiv);
+        return card;
+    }
+
+    function renderResults(filter = '') {
+        resultsContainer.innerHTML = '';
+        const favorites = getStorage('favorites');
+        const items = (currentView === 'history') ? getStorage('history') : favorites;
+        
+        const filteredItems = items.filter(item => item.toLowerCase().includes(filter.toLowerCase()));
+
+        filteredItems.forEach(item => {
+            const isFav = favorites.includes(item);
+            const card = createResultCard(item, isFav);
+            resultsContainer.appendChild(card);
+        });
+    }
+
+    function saveToHistory(newCaptions) {
+        let history = getStorage('history');
+        history = [...newCaptions.reverse(), ...history];
+        if (history.length > 50) history = history.slice(0, 50);
+        setStorage('history', history);
+    }
+
+    function toggleFavorite(captionText, btn) {
+        let favorites = getStorage('favorites');
+        const index = favorites.indexOf(captionText);
+        if (index > -1) {
+            favorites.splice(index, 1); // Remove from favorites
+            btn.classList.remove('favorited');
+            btn.innerHTML = '☆';
+        } else {
+            favorites.unshift(captionText); // Add to favorites
+            btn.classList.add('favorited');
+            btn.innerHTML = '⭐';
+        }
+        setStorage('favorites', favorites);
+        if (currentView === 'favorites') renderResults();
+    }
+
+    // --- Event Listeners ---
+    generateBtn.addEventListener('click', () => {
+        const topic = document.getElementById('topic-input').value;
+        if (!topic) return alert('Παρακαλώ, γράψε ένα θέμα!');
+        
+        spinnerContainer.style.display = 'flex';
+        resultsContainer.style.display = 'none';
+        
+        const payload = {
+            topic: topic,
+            keywords: document.getElementById('keywords').value,
+            platform: document.getElementById('platform-select').value,
+            contentType: document.getElementById('content-type-select').value,
+            tone: document.getElementById('tone-select').value,
+            language: document.getElementById('language-select').value,
+        };
+
+        fetch('/generate-caption', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(payload)
+        })
+        .then(response => response.json())
+        .then(data => {
+            spinnerContainer.style.display = 'none';
+            resultsContainer.style.display = 'block';
+
+            if (data.caption) {
+                const newCaptions = data.caption.split(/\d+\./).filter(Boolean).map(s => s.trim());
+                saveToHistory(newCaptions);
+                historyTab.click(); // Switch to history view to show new results
+            } else {
+                resultsContainer.innerHTML = `<div class="result-card">${data.error || 'Error'}</div>`;
+            }
+        })
+        .catch(error => {
+            spinnerContainer.style.display = 'none';
+            resultsContainer.style.display = 'block';
+            resultsContainer.innerHTML = '<div class="result-card">Network error.</div>';
+        });
+    });
+
+    themeSwitch.addEventListener('click', () => {
+        document.body.classList.toggle('dark-mode');
+        if (document.body.classList.contains('dark-mode')) {
+            localStorage.setItem('theme', 'dark');
+            themeSwitch.textContent = '☀️';
+        } else {
+            localStorage.setItem('theme', 'light');
+            themeSwitch.textContent = '🌙';
+        }
+    });
+    
+    searchInput.addEventListener('input', (e) => renderResults(e.target.value));
+
+    historyTab.addEventListener('click', () => {
+        currentView = 'history';
+        historyTab.classList.add('active');
+        favoritesTab.classList.remove('active');
+        renderResults(searchInput.value);
+    });
+
+    favoritesTab.addEventListener('click', () => {
+        currentView = 'favorites';
+        favoritesTab.classList.add('active');
+        historyTab.classList.remove('active');
+        renderResults(searchInput.value);
+    });
+
+    // --- Initial Load ---
+    document.addEventListener('DOMContentLoaded', () => {
+        if (localStorage.getItem('theme') === 'dark') {
+            document.body.classList.add('dark-mode');
+            themeSwitch.textContent = '☀️';
+        }
+        historyTab.click();
+    });
+    </script>
 </body>
 </html>
