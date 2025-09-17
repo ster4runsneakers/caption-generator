@@ -18,7 +18,7 @@
 
         <div class="form-controls">
             <input type="text" id="topic-input" placeholder="Κύριο θέμα...">
-            <input type="text" id="keywords" placeholder="Λέξεις-κλειδιά (π.χ. προσφορά, νέο)...">
+            <input type="text" id="keywords" placeholder="Λέξεις-κλειδιά...">
             
             <select id="platform-select">
                 <option value="Instagram">Instagram</option>
@@ -46,14 +46,16 @@
                 <option value="Greek">Ελληνικά</option>
                 <option value="English">Αγγλικά</option>
             </select>
+            
+            <select id="model-select" title="Choose your AI engine">
+                <option value="openai">OpenAI (GPT-3.5)</option>
+                <option value="gemini">Google (Gemini)</option>
+            </select>
         </div>
 
         <button id="generate-btn">Δημιουργία Περιεχομένου</button>
 
-        <div id="spinner-container" class="spinner-container">
-            <div class="spinner"></div>
-        </div>
-        
+        <div id="spinner-container" class="spinner-container"><div class="spinner"></div></div>
         <div class="history-controls">
             <div class="tabs">
                 <button id="tab-history" class="active">Ιστορικό</button>
@@ -61,173 +63,153 @@
             </div>
             <input type="text" id="search-history" placeholder="Αναζήτηση...">
         </div>
-
         <div id="results-container"></div>
     </div>
 
     <script>
-    // --- DOM Elements ---
-    const generateBtn = document.getElementById('generate-btn');
-    const resultsContainer = document.getElementById('results-container');
-    const spinnerContainer = document.getElementById('spinner-container');
-    const themeSwitch = document.getElementById('theme-switch');
-    const searchInput = document.getElementById('search-history');
-    const historyTab = document.getElementById('tab-history');
-    const favoritesTab = document.getElementById('tab-favorites');
+        // --- Event Listener for Generate Button ---
+        document.getElementById('generate-btn').addEventListener('click', () => {
+            const topic = document.getElementById('topic-input').value;
+            if (!topic) return alert('Παρακαλώ, γράψε ένα θέμα!');
+            
+            document.getElementById('spinner-container').style.display = 'flex';
+            document.getElementById('results-container').style.display = 'none';
+            
+            // Collect all form values, including the new model choice
+            const payload = {
+                topic: topic,
+                keywords: document.getElementById('keywords').value,
+                platform: document.getElementById('platform-select').value,
+                contentType: document.getElementById('content-type-select').value,
+                tone: document.getElementById('tone-select').value,
+                language: document.getElementById('language-select').value,
+                model_choice: document.getElementById('model-select').value
+            };
 
-    let currentView = 'history'; // 'history' or 'favorites'
+            // The rest of the JavaScript remains the same as before
+            fetch('/generate-caption', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload)
+            })
+            .then(response => response.json())
+            .then(data => {
+                document.getElementById('spinner-container').style.display = 'none';
+                document.getElementById('results-container').style.display = 'block';
 
-    // --- Core Functions ---
-    const getStorage = (key) => JSON.parse(localStorage.getItem(key)) || [];
-    const setStorage = (key, value) => localStorage.setItem(key, JSON.stringify(value));
-
-    function createResultCard(captionText, isFavorite) {
-        const card = document.createElement('div');
-        card.className = 'result-card';
-        
-        const textSpan = document.createElement('span');
-        textSpan.textContent = captionText.trim();
-        
-        const actionsDiv = document.createElement('div');
-        actionsDiv.className = 'card-actions';
-
-        const copyBtn = document.createElement('button');
-        copyBtn.className = 'copy-btn';
-        copyBtn.innerHTML = '📋';
-        copyBtn.title = 'Copy';
-        copyBtn.onclick = () => {
-            navigator.clipboard.writeText(textSpan.textContent);
-            copyBtn.innerHTML = '✅';
-            setTimeout(() => { copyBtn.innerHTML = '📋'; }, 2000);
-        };
-
-        const favBtn = document.createElement('button');
-        favBtn.className = `fav-btn ${isFavorite ? 'favorited' : ''}`;
-        favBtn.innerHTML = isFavorite ? '⭐' : '☆';
-        favBtn.title = 'Favorite';
-        favBtn.onclick = () => toggleFavorite(captionText, favBtn);
-
-        actionsDiv.appendChild(copyBtn);
-        actionsDiv.appendChild(favBtn);
-        card.appendChild(textSpan);
-        card.appendChild(actionsDiv);
-        return card;
-    }
-
-    function renderResults(filter = '') {
-        resultsContainer.innerHTML = '';
-        const favorites = getStorage('favorites');
-        const items = (currentView === 'history') ? getStorage('history') : favorites;
-        
-        const filteredItems = items.filter(item => item.toLowerCase().includes(filter.toLowerCase()));
-
-        filteredItems.forEach(item => {
-            const isFav = favorites.includes(item);
-            const card = createResultCard(item, isFav);
-            resultsContainer.appendChild(card);
+                if (data.caption) {
+                    const newCaptions = data.caption.split(/\d+\./).filter(Boolean).map(s => s.trim());
+                    saveToHistory(newCaptions);
+                    document.getElementById('tab-history').click();
+                } else {
+                    document.getElementById('results-container').innerHTML = `<div class="result-card">${data.error || 'Error'}</div>`;
+                }
+            })
+            .catch(error => {
+                document.getElementById('spinner-container').style.display = 'none';
+                document.getElementById('results-container').style.display = 'block';
+                document.getElementById('results-container').innerHTML = '<div class="result-card">Network error.</div>';
+            });
         });
-    }
 
-    function saveToHistory(newCaptions) {
-        let history = getStorage('history');
-        history = [...newCaptions.reverse(), ...history];
-        if (history.length > 50) history = history.slice(0, 50);
-        setStorage('history', history);
-    }
-
-    function toggleFavorite(captionText, btn) {
-        let favorites = getStorage('favorites');
-        const index = favorites.indexOf(captionText);
-        if (index > -1) {
-            favorites.splice(index, 1); // Remove from favorites
-            btn.classList.remove('favorited');
-            btn.innerHTML = '☆';
-        } else {
-            favorites.unshift(captionText); // Add to favorites
-            btn.classList.add('favorited');
-            btn.innerHTML = '⭐';
+        // --- All other JavaScript functions (history, favorites, dark mode etc.) remain unchanged ---
+        const resultsContainer = document.getElementById('results-container');
+        const themeSwitch = document.getElementById('theme-switch');
+        const searchInput = document.getElementById('search-history');
+        const historyTab = document.getElementById('tab-history');
+        const favoritesTab = document.getElementById('tab-favorites');
+        let currentView = 'history';
+        const getStorage = (key) => JSON.parse(localStorage.getItem(key)) || [];
+        const setStorage = (key, value) => localStorage.setItem(key, JSON.stringify(value));
+        function createResultCard(captionText, isFavorite) {
+            const card = document.createElement('div');
+            card.className = 'result-card';
+            const textSpan = document.createElement('span');
+            textSpan.textContent = captionText.trim();
+            const actionsDiv = document.createElement('div');
+            actionsDiv.className = 'card-actions';
+            const copyBtn = document.createElement('button');
+            copyBtn.className = 'copy-btn';
+            copyBtn.innerHTML = '📋';
+            copyBtn.title = 'Copy';
+            copyBtn.onclick = () => {
+                navigator.clipboard.writeText(textSpan.textContent);
+                copyBtn.innerHTML = '✅';
+                setTimeout(() => { copyBtn.innerHTML = '📋'; }, 2000);
+            };
+            const favBtn = document.createElement('button');
+            favBtn.className = `fav-btn ${isFavorite ? 'favorited' : ''}`;
+            favBtn.innerHTML = isFavorite ? '⭐' : '☆';
+            favBtn.title = 'Favorite';
+            favBtn.onclick = () => toggleFavorite(captionText, favBtn);
+            actionsDiv.appendChild(copyBtn);
+            actionsDiv.appendChild(favBtn);
+            card.appendChild(textSpan);
+            card.appendChild(actionsDiv);
+            return card;
         }
-        setStorage('favorites', favorites);
-        if (currentView === 'favorites') renderResults();
-    }
-
-    // --- Event Listeners ---
-    generateBtn.addEventListener('click', () => {
-        const topic = document.getElementById('topic-input').value;
-        if (!topic) return alert('Παρακαλώ, γράψε ένα θέμα!');
-        
-        spinnerContainer.style.display = 'flex';
-        resultsContainer.style.display = 'none';
-        
-        const payload = {
-            topic: topic,
-            keywords: document.getElementById('keywords').value,
-            platform: document.getElementById('platform-select').value,
-            contentType: document.getElementById('content-type-select').value,
-            tone: document.getElementById('tone-select').value,
-            language: document.getElementById('language-select').value,
-        };
-
-        fetch('/generate-caption', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(payload)
-        })
-        .then(response => response.json())
-        .then(data => {
-            spinnerContainer.style.display = 'none';
-            resultsContainer.style.display = 'block';
-
-            if (data.caption) {
-                const newCaptions = data.caption.split(/\d+\./).filter(Boolean).map(s => s.trim());
-                saveToHistory(newCaptions);
-                historyTab.click(); // Switch to history view to show new results
+        function renderResults(filter = '') {
+            resultsContainer.innerHTML = '';
+            const favorites = getStorage('favorites');
+            const items = (currentView === 'history') ? getStorage('history') : favorites;
+            const filteredItems = items.filter(item => item.toLowerCase().includes(filter.toLowerCase()));
+            filteredItems.forEach(item => {
+                const isFav = favorites.includes(item);
+                const card = createResultCard(item, isFav);
+                resultsContainer.appendChild(card);
+            });
+        }
+        function saveToHistory(newCaptions) {
+            let history = getStorage('history');
+            history = [...newCaptions.reverse(), ...history];
+            if (history.length > 50) history = history.slice(0, 50);
+            setStorage('history', history);
+        }
+        function toggleFavorite(captionText, btn) {
+            let favorites = getStorage('favorites');
+            const index = favorites.indexOf(captionText);
+            if (index > -1) {
+                favorites.splice(index, 1);
+                btn.classList.remove('favorited');
+                btn.innerHTML = '☆';
             } else {
-                resultsContainer.innerHTML = `<div class="result-card">${data.error || 'Error'}</div>`;
+                favorites.unshift(captionText);
+                btn.classList.add('favorited');
+                btn.innerHTML = '⭐';
             }
-        })
-        .catch(error => {
-            spinnerContainer.style.display = 'none';
-            resultsContainer.style.display = 'block';
-            resultsContainer.innerHTML = '<div class="result-card">Network error.</div>';
+            setStorage('favorites', favorites);
+            if (currentView === 'favorites') renderResults();
+        }
+        themeSwitch.addEventListener('click', () => {
+            document.body.classList.toggle('dark-mode');
+            if (document.body.classList.contains('dark-mode')) {
+                localStorage.setItem('theme', 'dark');
+                themeSwitch.textContent = '☀️';
+            } else {
+                localStorage.setItem('theme', 'light');
+                themeSwitch.textContent = '🌙';
+            }
         });
-    });
-
-    themeSwitch.addEventListener('click', () => {
-        document.body.classList.toggle('dark-mode');
-        if (document.body.classList.contains('dark-mode')) {
-            localStorage.setItem('theme', 'dark');
-            themeSwitch.textContent = '☀️';
-        } else {
-            localStorage.setItem('theme', 'light');
-            themeSwitch.textContent = '🌙';
-        }
-    });
-    
-    searchInput.addEventListener('input', (e) => renderResults(e.target.value));
-
-    historyTab.addEventListener('click', () => {
-        currentView = 'history';
-        historyTab.classList.add('active');
-        favoritesTab.classList.remove('active');
-        renderResults(searchInput.value);
-    });
-
-    favoritesTab.addEventListener('click', () => {
-        currentView = 'favorites';
-        favoritesTab.classList.add('active');
-        historyTab.classList.remove('active');
-        renderResults(searchInput.value);
-    });
-
-    // --- Initial Load ---
-    document.addEventListener('DOMContentLoaded', () => {
-        if (localStorage.getItem('theme') === 'dark') {
-            document.body.classList.add('dark-mode');
-            themeSwitch.textContent = '☀️';
-        }
-        historyTab.click();
-    });
+        searchInput.addEventListener('input', (e) => renderResults(e.target.value));
+        historyTab.addEventListener('click', () => {
+            currentView = 'history';
+            historyTab.classList.add('active');
+            favoritesTab.classList.remove('active');
+            renderResults(searchInput.value);
+        });
+        favoritesTab.addEventListener('click', () => {
+            currentView = 'favorites';
+            favoritesTab.classList.add('active');
+            historyTab.classList.remove('active');
+            renderResults(searchInput.value);
+        });
+        document.addEventListener('DOMContentLoaded', () => {
+            if (localStorage.getItem('theme') === 'dark') {
+                document.body.classList.add('dark-mode');
+                themeSwitch.textContent = '☀️';
+            }
+            historyTab.click();
+        });
     </script>
 </body>
 </html>
