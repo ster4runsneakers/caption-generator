@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="el">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Caption Generator</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            background-color: #f4f4f9;
+            color: #333;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+        .container {
+            background-color: white;
+            padding: 40px;
+            border-radius: 12px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+            width: 90%;
+            max-width: 600px;
+            text-align: center;
+        }
+        h1 {
+            color: #5a5a5a;
+        }
+        input[type="text"] {
+            width: calc(100% - 22px);
+            padding: 10px;
+            margin-bottom: 20px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            font-size: 16px;
+        }
+        button {
+            background-color: #007bff;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 6px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+        #caption-output {
+            margin-top: 30px;
+            padding: 20px;
+            background-color: #f9f9f9;
+            border: 1px solid #eee;
+            border-radius: 6px;
+            text-align: left;
+            white-space: pre-wrap; /* Για να αναγνωρίζει τις αλλαγές γραμμής */
+            min-height: 100px;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <h1>Δημιουργός Caption</h1>
+        <p>Γράψε ένα θέμα και πάτα το κουμπί για να δημιουργήσεις ένα caption!</p>
+
+        <input type="text" id="topic-input" placeholder="π.χ., ένα ηλιόλουστο πρωινό στην παραλία">
+
+        <button id="generate-btn">Δημιουργία Caption</button>
+
+        <pre id="caption-output">Το caption σου θα εμφανιστεί εδώ...</pre>
+    </div>
+
+    <script>
+        // Παίρνουμε τα HTML στοιχεία με τα οποία θα δουλέψουμε
+        const topicInput = document.getElementById('topic-input');
+        const generateBtn = document.getElementById('generate-btn');
+        const captionOutput = document.getElementById('caption-output');
+
+        // Προσθέτουμε έναν "ακροατή" στο κουμπί. Όταν ο χρήστης κάνει κλικ...
+        generateBtn.addEventListener('click', () => {
+            // Παίρνουμε το κείμενο από το πεδίο εισαγωγής
+            const topic = topicInput.value;
+
+            // Έλεγχος αν ο χρήστης δεν έγραψε τίποτα
+            if (!topic) {
+                alert('Παρακαλώ, γράψε ένα θέμα!');
+                return;
+            }
+
+            // Εμφανίζουμε ένα μήνυμα αναμονής
+            captionOutput.textContent = 'Δημιουργία...';
+
+            // Χρησιμοποιούμε τη συνάρτηση fetch για να στείλουμε το αίτημα στο backend μας
+            fetch('http://127.0.0.1:5000/generate-caption', {
+                method: 'POST', // Η μέθοδος πρέπει να είναι POST
+                headers: {
+                    'Content-Type': 'application/json' // Λέμε στο backend ότι στέλνουμε JSON
+                },
+                // Μετατρέπουμε το JavaScript object σε κείμενο JSON
+                body: JSON.stringify({
+                    topic: topic,
+                    platform: "Instagram" // Μπορείς να το αλλάξεις ή να προσθέσεις κι άλλο πεδίο
+                })
+            })
+            .then(response => response.json()) // Παίρνουμε την απάντηση και τη μετατρέπουμε σε JSON
+            .then(data => {
+                // Αν όλα πήγαν καλά, βάζουμε το caption στο πεδίο εξόδου
+                captionOutput.textContent = data.caption;
+            })
+            .catch(error => {
+                // Αν κάτι πάει στραβά, το εμφανίζουμε στο πεδίο εξόδου και στην κονσόλα
+                console.error('Error:', error);
+                captionOutput.textContent = 'Παρουσιάστηκε σφάλμα. Δες την κονσόλα του browser.';
+            });
+        });
+    </script>
+
+</body>
+</html>
