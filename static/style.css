@@ -1,72 +1,113 @@
+/* --- Γενικό Στυλ & Background --- */
 body {
-    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-    background-color: #f4f4f9;
+    font-family: 'Poppins', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    background: linear-gradient(110deg, #f0f4f8, #d9e2ec);
     color: #333;
     display: flex;
     justify-content: center;
-    align-items: center;
-    height: 100vh;
+    align-items: flex-start; /* Αλλαγή σε flex-start για να μην είναι κολλημένο στο κέντρο */
+    min-height: 100vh;
+    padding-top: 50px; /* Προσθήκη padding πάνω */
     margin: 0;
 }
 
+/* --- Κεντρικό Container --- */
 .container {
     background-color: white;
     padding: 40px;
-    border-radius: 12px;
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+    border-radius: 16px;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
     width: 90%;
-    max-width: 600px;
+    max-width: 700px;
     text-align: center;
+    border: 1px solid rgba(255, 255, 255, 0.2);
 }
 
 h1 {
-    color: #5a5a5a;
+    color: #2c3e50;
+    font-weight: 600;
 }
 
-input[type="text"] {
-    width: calc(100% - 22px);
-    padding: 10px;
+p {
+    color: #7f8c8d;
+    margin-bottom: 30px;
+}
+
+/* --- Στυλ για τα πεδία εισαγωγής --- */
+input[type="text"], select {
+    width: 100%;
+    padding: 12px 15px;
     margin-bottom: 20px;
-    border: 1px solid #ddd;
-    border-radius: 6px;
+    border: 1px solid #dfe6e9;
+    border-radius: 8px;
     font-size: 16px;
+    box-sizing: border-box; /* Διασφαλίζει ότι το padding δεν αλλάζει το πλάτος */
+    background-color: #f8fafc;
+    transition: border-color 0.3s, box-shadow 0.3s;
 }
 
-select {
-    width: 48%;
-    padding: 10px;
-    margin-bottom: 20px;
-    border: 1px solid #ddd;
-    border-radius: 6px;
-    font-size: 16px;
-    display: inline-block;
-    margin: 0 1% 20px 1%; /* Προστέθηκε για μικρή απόσταση ανάμεσά τους */
+input[type="text"]:focus, select:focus {
+    outline: none;
+    border-color: #3498db;
+    box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.2);
 }
 
-button {
-    background-color: #007bff;
+/* --- Στυλ για το κεντρικό κουμπί --- */
+button#generate-btn {
+    background: linear-gradient(45deg, #3498db, #2980b9);
     color: white;
     border: none;
-    padding: 12px 24px;
-    border-radius: 6px;
+    padding: 14px 28px;
+    border-radius: 8px;
     font-size: 16px;
+    font-weight: 600;
     cursor: pointer;
-    transition: background-color 0.3s;
-    width: 100%; /* Για να πιάνει όλο το πλάτος */
+    transition: transform 0.2s, box-shadow 0.2s;
+    width: 100%;
+    margin-top: 10px;
 }
 
-button:hover {
-    background-color: #0056b3;
+button#generate-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(52, 152, 219, 0.3);
 }
 
-#caption-output {
+/* --- Περιοχή Αποτελεσμάτων --- */
+#results-container {
     margin-top: 30px;
-    padding: 20px;
-    background-color: #f9f9f9;
-    border: 1px solid #eee;
-    border-radius: 6px;
     text-align: left;
-    white-space: pre-wrap; /* Για να αναγνωρίζει τις αλλαγές γραμμής από το AI */
-    min-height: 100px;
-    line-height: 1.6; /* Για καλύτερη αναγνωσιμότητα */
+}
+
+/* --- Στυλ για κάθε κάρτα αποτελέσματος --- */
+.result-card {
+    background-color: #f8fafc;
+    border: 1px solid #e2e8f0;
+    border-radius: 12px;
+    padding: 20px;
+    margin-bottom: 15px;
+    position: relative; /* Απαραίτητο για το κουμπί αντιγραφής */
+    line-height: 1.6;
+    white-space: pre-wrap;
+    font-size: 15px;
+}
+
+/* --- Στυλ για το κουμπί Αντιγραφής --- */
+.copy-btn {
+    position: absolute;
+    top: 15px;
+    right: 15px;
+    background-color: #dbe4ee;
+    color: #556a81;
+    border: none;
+    border-radius: 6px;
+    padding: 6px 12px;
+    font-size: 12px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background-color 0.3s, color 0.3s;
+}
+
+.copy-btn:hover {
+    background-color: #3498db;
+    color: white;
 }

@@ -3,14 +3,17 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Caption Generator</title>
+    <title>AI Social Media Assistant</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 </head>
 <body>
 
     <div class="container">
         <h1>AI Social Media Assistant</h1>
-        <p>Συμπλήρωσε τις επιλογές για να δημιουργήσεις το τέλειο περιεχόμενο!</p>
+        <p>Δημιούργησε Hooks, CTAs και Captions για τα social media σου σε δευτερόλεπτα.</p>
 
         <input type="text" id="topic-input" placeholder="π.χ., ένα ηλιόλουστο πρωινό στην παραλία">
 
@@ -37,23 +40,22 @@
 
         <button id="generate-btn">Δημιουργία Περιεχομένου</button>
 
-        <pre id="caption-output">Το περιεχόμενό σου θα εμφανιστεί εδώ...</pre>
+        <div id="results-container">
+            </div>
     </div>
 
     <script>
-        // Παίρνουμε και το νέο select element
-        const contentTypeSelect = document.getElementById('content-type-select');
         const topicInput = document.getElementById('topic-input');
         const platformSelect = document.getElementById('platform-select');
+        const contentTypeSelect = document.getElementById('content-type-select');
         const toneSelect = document.getElementById('tone-select');
         const generateBtn = document.getElementById('generate-btn');
-        const captionOutput = document.getElementById('caption-output');
+        const resultsContainer = document.getElementById('results-container');
 
         generateBtn.addEventListener('click', () => {
             const topic = topicInput.value;
             const platform = platformSelect.value;
             const tone = toneSelect.value;
-            // Παίρνουμε την τιμή και από το νέο dropdown
             const contentType = contentTypeSelect.value;
 
             if (!topic) {
@@ -61,14 +63,13 @@
                 return;
             }
 
-            captionOutput.textContent = 'Δημιουργία...';
+            resultsContainer.innerHTML = '<p>Δημιουργία...</p>';
 
             fetch('/generate-caption', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
                 },
-                // Στέλνουμε όλες τις τιμές στο backend
                 body: JSON.stringify({
                     topic: topic,
                     platform: platform,
@@ -78,11 +79,44 @@
             })
             .then(response => response.json())
             .then(data => {
-                captionOutput.textContent = data.caption || data.error;
+                resultsContainer.innerHTML = ''; // Καθαρίζουμε το container
+                if (data.caption) {
+                    // Διαχωρίζουμε τα αποτελέσματα με βάση τους αριθμούς (1., 2., 3.)
+                    const captions = data.caption.split(/\d+\./).filter(item => item.trim() !== '');
+                    
+                    captions.forEach(captionText => {
+                        // Δημιουργούμε μια κάρτα για κάθε αποτέλεσμα
+                        const card = document.createElement('div');
+                        card.className = 'result-card';
+                        
+                        const text = document.createElement('span');
+                        text.textContent = captionText.trim();
+                        
+                        const copyBtn = document.createElement('button');
+                        copyBtn.className = 'copy-btn';
+                        copyBtn.textContent = 'Αντιγραφή';
+                        
+                        // Λειτουργία Αντιγραφής
+                        copyBtn.onclick = () => {
+                            navigator.clipboard.writeText(text.textContent).then(() => {
+                                copyBtn.textContent = 'Αντιγράφηκε!';
+                                setTimeout(() => {
+                                    copyBtn.textContent = 'Αντιγραφή';
+                                }, 2000); // Επαναφορά του κουμπιού μετά από 2 δευτερόλεπτα
+                            });
+                        };
+                        
+                        card.appendChild(text);
+                        card.appendChild(copyBtn);
+                        resultsContainer.appendChild(card);
+                    });
+                } else {
+                    resultsContainer.innerHTML = `<div class="result-card">${data.error}</div>`;
+                }
             })
             .catch(error => {
                 console.error('Error:', error);
-                captionOutput.textContent = 'Παρουσιάστηκε σφάλμα. Δες την κονσόλα του browser.';
+                resultsContainer.innerHTML = '<div class="result-card">Παρουσιάστηκε σφάλμα. Δες την κονσόλα του browser.</div>';
             });
         });
     </script>
