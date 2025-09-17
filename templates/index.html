@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Caption Generator</title>
-    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 </head>
 <body>
 
@@ -52,8 +52,9 @@
 
             captionOutput.textContent = 'Δημιουργία...';
 
-            // Θυμήσου να βάλεις εδώ το δικό σου URL από το Render
-            fetch('https://caption-generator-app.onrender.com/generate-caption', {
+            // The JavaScript doesn't need the full Render URL anymore.
+            // It can just call the local API endpoint directly.
+            fetch('/generate-caption', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
@@ -66,7 +67,7 @@
             })
             .then(response => response.json())
             .then(data => {
-                captionOutput.textContent = data.caption || data.error; // Εμφανίζει και το caption και τυχόν error
+                captionOutput.textContent = data.caption || data.error;
             })
             .catch(error => {
                 console.error('Error:', error);

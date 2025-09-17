@@ -1,46 +1,56 @@
 import os
-from flask import Flask, request, jsonify
+from flask import Flask, request, jsonify, render_template
 from openai import OpenAI
 from dotenv import load_dotenv
-from flask_cors import CORS # <-- 1. ΕΙΣΑΓΩΓΗ ΤΗΣ ΒΙΒΛΙΟΘΗΚΗΣ CORS
+from flask_cors import CORS
 
-# Φορτώνει τις μεταβλητές από το αρχείο .env (το API key μας)
+# Load environment variables from .env file
 load_dotenv()
 
-# Δημιουργία της Flask εφαρμογής
+# Create the Flask application
 app = Flask(__name__)
-
-# <-- 2. ΕΝΕΡΓΟΠΟΙΗΣΗ ΤΟΥ CORS ΓΙΑ ΟΛΗ ΤΗΝ ΕΦΑΡΜΟΓΗ
 CORS(app) 
 
-# Δημιουργία ενός client για την επικοινωνία με το OpenAI API
+# Initialize the OpenAI client
 try:
     client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
 except Exception as e:
     print(f"Error initializing OpenAI client: {e}")
     client = None
 
-# Ορίζουμε το endpoint μας για τη δημιουργία caption.
+# Route to serve the main HTML page
+@app.route('/')
+def index():
+    return render_template('index.html')
+
+# API endpoint for generating captions
 @app.route('/generate-caption', methods=['POST'])
 def generate_caption():
     if not client:
         return jsonify({"error": "OpenAI client not initialized. Check your API key."}), 500
         
-    # Παίρνουμε τα δεδομένα που έστειλε το frontend (σε μορφή JSON)
     data = request.get_json()
 
-    # Ελέγχουμε αν μας έστειλε το θέμα (topic)
     if not data or 'topic' not in data:
         return jsonify({"error": "Topic is required"}), 400
 
     topic = data.get('topic')
     platform = data.get('platform', 'Instagram')
+    tone = data.get('tone', 'Friendly')
 
-    # "Χτίζουμε" την ερώτηση (prompt) προς το ChatGPT
-    prompt = f"Create a captivating and short {platform} caption for a post about '{topic}'. Include relevant hashtags."
+    # New, smarter prompt
+    prompt = f"""
+    Generate 3 distinct, creative, and engaging captions for a {platform} post.
+    The topic is: '{topic}'.
+    The desired tone is: {tone}.
+    
+    Please structure the output clearly, for example:
+    1. [First caption here with relevant hashtags]
+    2. [Second caption here with relevant hashtags]
+    3. [Third caption here with relevant hashtags]
+    """
 
     try:
-        # Καλούμε το API του ChatGPT
         chat_completion = client.chat.completions.create(
             messages=[
                 {
@@ -51,22 +61,12 @@ def generate_caption():
             model="gpt-3.5-turbo",
         )
 
-        # Παίρνουμε την απάντηση
         generated_text = chat_completion.choices[0].message.content.strip()
-
-        # Επιστρέφουμε την απάντηση σε μορφή JSON
         return jsonify({"caption": generated_text})
 
     except Exception as e:
-        # Αν κάτι πάει στραβά με το API call, επιστρέφουμε ένα μήνυμα λάθους
         return jsonify({"error": str(e)}), 500
 
-# Μια απλή διαδρομή για να ελέγξουμε αν ο server μας τρέχει
-@app.route('/')
-def index():
-    return "Caption Generator API is running!"
-
-
-# Ξεκινάει τον server όταν εκτελούμε το αρχείο με 'python app.py'
+# Start the server when the script is run
 if __name__ == '__main__':
     app.run(debug=True)
