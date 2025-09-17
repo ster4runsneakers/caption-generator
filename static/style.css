@@ -1,21 +1,123 @@
-/* --- Στυλ για το Spinner (Ένδειξη Φόρτωσης) --- */
+/* --- Γενικό Στυλ & Background --- */
+body {
+    font-family: 'Poppins', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    background: linear-gradient(110deg, #f0f4f8, #d9e2ec);
+    color: #333;
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    min-height: 100vh;
+    padding-top: 50px;
+    margin: 0;
+}
+
+/* --- Κεντρικό Container --- */
+.container {
+    background-color: white;
+    padding: 40px;
+    border-radius: 16px;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+    width: 90%;
+    max-width: 700px;
+    text-align: center;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+h1 {
+    color: #2c3e50;
+    font-weight: 600;
+}
+
+p {
+    color: #7f8c8d;
+    margin-bottom: 30px;
+}
+
+/* --- Στυλ για τα πεδία εισαγωγής (παλιό) --- */
+/* Αυτοί οι κανόνες δεν χρειάζονται πλέον εδώ, θα τους χειριστούμε παρακάτω */
+/* input[type="text"], select { ... } */
+
+input[type="text"]:focus, select:focus {
+    outline: none;
+    border-color: #3498db;
+    box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.2);
+}
+
+/* --- Στυλ για το κεντρικό κουμπί --- */
+button#generate-btn {
+    background: linear-gradient(45deg, #3498db, #2980b9);
+    color: white;
+    border: none;
+    padding: 14px 28px;
+    border-radius: 8px;
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: transform 0.2s, box-shadow 0.2s;
+    width: 100%;
+}
+
+button#generate-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(52, 152, 219, 0.3);
+}
+
+/* --- Περιοχή Αποτελεσμάτων --- */
+#results-container {
+    margin-top: 30px;
+    text-align: left;
+}
+
+.result-card {
+    background-color: #f8fafc;
+    border: 1px solid #e2e8f0;
+    border-radius: 12px;
+    padding: 20px;
+    margin-bottom: 15px;
+    position: relative;
+    line-height: 1.6;
+    white-space: pre-wrap;
+    font-size: 15px;
+}
+
+.copy-btn {
+    position: absolute;
+    top: 15px;
+    right: 15px;
+    background-color: #dbe4ee;
+    color: #556a81;
+    border: none;
+    border-radius: 6px;
+    padding: 6px 12px;
+    font-size: 12px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background-color 0.3s, color 0.3s;
+}
+
+.copy-btn:hover {
+    background-color: #3498db;
+    color: white;
+}
+
+/* --- Spinner --- */
 .spinner-container {
-    display: none; /* Κρυφό από προεπιλογή */
+    display: none;
     position: relative;
     width: 100%;
-    min-height: 150px; /* Ίδιο ύψος με τις κάρτες για να μην "πηδάει" η σελίδα */
+    min-height: 150px;
     display: flex;
     justify-content: center;
     align-items: center;
 }
 
 .spinner {
-    border: 6px solid #f3f3f3; /* Ανοιχτό γκρι κύκλος */
-    border-top: 6px solid #3498db; /* Μπλε χρώμα για την κίνηση */
+    border: 6px solid #f3f3f3;
+    border-top: 6px solid #3498db;
     border-radius: 50%;
     width: 50px;
     height: 50px;
-    animation: spin 1s linear infinite; /* Animation */
+    animation: spin 1s linear infinite;
 }
 
 @keyframes spin {
@@ -23,7 +125,7 @@
     100% { transform: rotate(360deg); }
 }
 
-/* --- Στυλ για τον τίτλο του ιστορικού --- */
+/* --- Ιστορικό --- */
 h2.history-title {
     text-align: left;
     color: #2c3e50;
@@ -32,4 +134,34 @@ h2.history-title {
     font-size: 18px;
     border-bottom: 2px solid #e2e8f0;
     padding-bottom: 5px;
+}
+
+/* --- ΝΕΟΙ ΚΑΝΟΝΕΣ ΓΙΑ ΤΗ ΔΙΑΤΑΞΗ ΤΗΣ ΦΟΡΜΑΣ --- */
+.form-controls {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 15px;
+    margin-bottom: 20px;
+}
+
+.form-controls input[type="text"], 
+.form-controls select {
+    width: 100%; /* Default width for mobile */
+    padding: 12px 15px;
+    border: 1px solid #dfe6e9;
+    border-radius: 8px;
+    font-size: 16px;
+    box-sizing: border-box;
+    background-color: #f8fafc;
+    transition: border-color 0.3s, box-shadow 0.3s;
+}
+
+.form-controls input[type="text"] {
+    flex-grow: 1; /* Allow the text input to grow */
+    min-width: 250px;
+}
+
+.form-controls select {
+    flex-grow: 1; /* Allow selects to grow */
+    min-width: 150px;
 }

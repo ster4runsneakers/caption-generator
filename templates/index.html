@@ -15,33 +15,31 @@
         <h1>AI Social Media Assistant</h1>
         <p>Δημιούργησε Hooks, CTAs και Captions για τα social media σου σε δευτερόλεπτα.</p>
 
-        <input type="text" id="topic-input" placeholder="π.χ., ένα ηλιόλουστο πρωινό στην παραλία">
-
-        <select id="platform-select">
-            <option value="Instagram">Instagram</option>
-            <option value="TikTok">TikTok</option>
-            <option value="Facebook">Facebook</option>
-            <option value="Pinterest">Pinterest</option>
-            <option value="YouTube">YouTube</option>
-        </select>
-        
-        <select id="content-type-select">
-            <option value="Caption">Full Caption (3 επιλογές)</option>
-            <option value="Hook">Μόνο Hook (3 επιλογές)</option>
-            <option value="CTA">Μόνο CTA (3 επιλογές)</option>
-        </select>
-
-        <select id="tone-select">
-            <option value="Friendly">Φιλικό</option>
-            <option value="Professional">Επαγγελματικό</option>
-            <option value="Funny">Αστείο</option>
-            <option value="Enthusiastic">Ενθουσιώδες</option>
-        </select>
-        
-        <select id="language-select">
-            <option value="Greek">Ελληνικά</option>
-            <option value="English">Αγγλικά</option>
-        </select>
+        <div class="form-controls">
+            <input type="text" id="topic-input" placeholder="π.χ., ένα ηλιόλουστο πρωινό στην παραλία">
+            <select id="platform-select">
+                <option value="Instagram">Instagram</option>
+                <option value="TikTok">TikTok</option>
+                <option value="Facebook">Facebook</option>
+                <option value="Pinterest">Pinterest</option>
+                <option value="YouTube">YouTube</option>
+            </select>
+            <select id="content-type-select">
+                <option value="Caption">Full Caption (3 επιλογές)</option>
+                <option value="Hook">Μόνο Hook (3 επιλογές)</option>
+                <option value="CTA">Μόνο CTA (3 επιλογές)</option>
+            </select>
+            <select id="tone-select">
+                <option value="Friendly">Φιλικό</option>
+                <option value="Professional">Επαγγελματικό</option>
+                <option value="Funny">Αστείο</option>
+                <option value="Enthusiastic">Ενθουσιώδες</option>
+            </select>
+            <select id="language-select">
+                <option value="Greek">Ελληνικά</option>
+                <option value="English">Αγγλικά</option>
+            </select>
+        </div>
 
         <button id="generate-btn">Δημιουργία Περιεχομένου</button>
 
@@ -59,13 +57,12 @@
         const platformSelect = document.getElementById('platform-select');
         const contentTypeSelect = document.getElementById('content-type-select');
         const toneSelect = document.getElementById('tone-select');
-        const languageSelect = document.getElementById('language-select'); // Νέο select
+        const languageSelect = document.getElementById('language-select');
         const generateBtn = document.getElementById('generate-btn');
         const resultsContainer = document.getElementById('results-container');
         const spinnerContainer = document.getElementById('spinner-container');
 
-        // ... (Οι συναρτήσεις createResultCards, loadHistory, saveToHistory παραμένουν ίδιες) ...
-        
+        // --- Core Functions ---
         function createResultCards(captions) {
             captions.forEach(captionText => {
                 const card = document.createElement('div');
@@ -112,25 +109,20 @@
                 alert('Παρακαλώ, γράψε ένα θέμα!');
                 return;
             }
-
             spinnerContainer.style.display = 'flex';
-            resultsContainer.innerHTML = ''; 
-
+            resultsContainer.innerHTML = '';
             const platform = platformSelect.value;
             const tone = toneSelect.value;
             const contentType = contentTypeSelect.value;
-            const language = languageSelect.value; // Παίρνουμε τη γλώσσα
-
+            const language = languageSelect.value;
             fetch('/generate-caption', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                // Στέλνουμε τη νέα παράμετρο στο backend
                 body: JSON.stringify({ topic, platform, tone, contentType, language })
             })
             .then(response => response.json())
             .then(data => {
                 spinnerContainer.style.display = 'none';
-
                 if (data.caption) {
                     const newCaptions = data.caption.split(/\d+\./).filter(item => item.trim() !== '');
                     saveToHistory(newCaptions);
@@ -145,7 +137,7 @@
                 resultsContainer.innerHTML = '<div class="result-card">Παρουσιάστηκε σφάλμα δικτύου.</div>';
             });
         });
-
+        
         // --- Initial Load ---
         document.addEventListener('DOMContentLoaded', loadHistory);
     </script>
