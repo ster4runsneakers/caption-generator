@@ -21,69 +21,79 @@
             <button id="tab-history">Ιστορικό & Αγαπημένα</button>
         </div>
         
-        <div id="view-text" class="view-container active">
-            <p>Δημιούργησε Hooks, CTAs και Captions για τα social media σου.</p>
-            <div class="form-controls">
-                <input type="text" id="topic-input" placeholder="Κύριο θέμα...">
-                <input type="text" id="keywords" placeholder="Λέξεις-κλειδιά...">
-                <select id="platform-select">
-                    <option value="Instagram">Instagram</option>
-                    <option value="TikTok">TikTok</option>
-                    <option value="Facebook">Facebook</option>
-                    <option value="Pinterest">Pinterest</option>
-                    <option value="YouTube">YouTube</option>
-                </select>
-                <select id="content-type-select">
-                    <option value="Caption">Full Caption</option>
-                    <option value="Hook">Μόνο Hook</option>
-                    <option value="CTA">Μόνο CTA</option>
-                    <option value="Hashtags">Μόνο Hashtags</option>
-                </select>
-                <select id="tone-select">
-                    <option value="Friendly">Φιλικό</option>
-                    <option value="Professional">Επαγγελματικό</option>
-                    <option value="Funny">Αστείο</option>
-                    <option value="Enthusiastic">Ενθουσιώδες</option>
-                </select>
-                <select id="language-select">
-                    <option value="Greek">Ελληνικά</option>
-                    <option value="English">Αγγλικά</option>
-                </select>
-                <select id="model-select" title="Choose your AI engine">
-                    <option value="openai">OpenAI (GPT-3.5)</option>
-                    <option value="gemini">Google (Gemini)</option>
-                </select>
-            </div>
-            <button id="generate-text-btn">Δημιουργία Κειμένου</button>
-        </div>
-
-        <div id="view-image" class="view-container">
-            <p>Περιέγραψε την εικόνα που θέλεις να δημιουργήσεις.</p>
-            <div class="form-controls">
-                <input type="text" id="image-prompt-input" placeholder="π.χ., Ένας αστροναύτης σε μια παραλία, ρεαλιστικό στυλ...">
-                <select id="image-style-select">
-                    <option value="photorealistic">Φωτορεαλιστικό</option>
-                    <option value="digital art">Digital Art</option>
-                    <option value="cartoon">Cartoon</option>
-                    <option value="fantasy">Fantasy</option>
-                    <option value="3d render">3D Render</option>
-                </select>
-            </div>
-            <button id="generate-image-btn">Δημιουργία Εικόνας</button>
-        </div>
-
-        <div id="view-history" class="view-container">
-             <div class="history-controls">
-                <div class="tabs">
-                    <button id="subtab-history" class="active">Ιστορικό</button>
-                    <button id="subtab-favorites">Αγαπημένα</button>
+        <div class="view-content"> <div id="view-text" class="view-container active">
+                <p>Δημιούργησε Hooks, CTAs και Captions για τα social media σου.</p>
+                <div class="form-controls">
+                    <input type="text" id="topic-input" placeholder="Κύριο θέμα...">
+                    <input type="text" id="keywords" placeholder="Λέξεις-κλειδιά...">
+                    <select id="platform-select">
+                        <option value="Instagram">Instagram</option>
+                        <option value="TikTok">TikTok</option>
+                        <option value="Facebook">Facebook</option>
+                        <option value="Pinterest">Pinterest</option>
+                        <option value="YouTube">YouTube</option>
+                    </select>
+                    <select id="content-type-select">
+                        <option value="Caption">Full Caption</option>
+                        <option value="Hook">Μόνο Hook</option>
+                        <option value="CTA">Μόνο CTA</option>
+                        <option value="Hashtags">Μόνο Hashtags</option>
+                    </select>
+                    <select id="tone-select">
+                        <option value="Friendly">Φιλικό</option>
+                        <option value="Professional">Επαγγελματικό</option>
+                        <option value="Funny">Αστείο</option>
+                        <option value="Enthusiώδες">Ενθουσιώδες</option>
+                    </select>
+                    <select id="language-select">
+                        <option value="Greek">Ελληνικά</option>
+                        <option value="English">Αγγλικά</option>
+                    </select>
+                    <select id="model-select" title="Choose your AI engine">
+                        <option value="openai">OpenAI (GPT-3.5)</option>
+                        <option value="gemini">Google (Gemini)</option>
+                    </select>
                 </div>
-                <input type="text" id="search-history" placeholder="Αναζήτηση...">
+                <button id="generate-text-btn">Δημιουργία Κειμένου</button>
             </div>
-            <div id="history-results-container"></div>
-        </div>
 
-        <div id="spinner-container" class="spinner-container"><div class="spinner"></div></div>
+            <div id="view-image" class="view-container">
+                <p>Δημιούργησε μια εικόνα με AI ή ανέβασε μια δική σου.</p>
+                
+                <div class="form-section ai-generation-section">
+                    <h3>Δημιουργία με AI</h3>
+                    <div class="form-controls">
+                        <input type="text" id="image-prompt-input" placeholder="Περιγραφή εικόνας για το AI...">
+                        <select id="image-style-select">
+                            <option value="photorealistic">Φωτορεαλιστικό</option>
+                            <option value="digital art">Digital Art</option>
+                            <option value="cartoon">Cartoon</option>
+                            <option value="fantasy">Fantasy</option>
+                            <option value="3d render">3D Render</option>
+                        </select>
+                    </div>
+                    <button id="generate-image-btn">Δημιουργία Εικόνας με AI</button>
+                </div>
+
+                <div class="form-section upload-section">
+                    <h3>Ανέβασμα Δικής σου Εικόνας</h3>
+                    <input type="file" id="file-input" accept="image/png, image/jpeg">
+                    <label for="file-input" class="file-label">Επίλεξε Φωτογραφία</label>
+                    <button id="upload-btn">Ανέβασμα Φωτογραφίας</button>
+                </div>
+            </div>
+
+            <div id="view-history" class="view-container">
+                 <div class="history-controls">
+                    <div class="tabs">
+                        <button id="subtab-history" class="active">Ιστορικό</button>
+                        <button id="subtab-favorites">Αγαπημένα</button>
+                    </div>
+                    <input type="text" id="search-history" placeholder="Αναζήτηση...">
+                </div>
+                <div id="history-results-container"></div>
+            </div>
+        </div> <div id="spinner-container" class="spinner-container"><div class="spinner"></div></div>
         <div id="generation-results-container"></div>
     </div>
 
@@ -105,6 +115,10 @@
     const historySubTab = document.getElementById('subtab-history');
     const favoritesSubTab = document.getElementById('subtab-favorites');
 
+    // NEW UPLOAD ELEMENTS
+    const uploadBtn = document.getElementById('upload-btn');
+    const fileInput = document.getElementById('file-input');
+
     let currentHistoryView = 'history';
 
     // --- Core Functions (getStorage, setStorage, createResultCard, etc.) ---
@@ -120,7 +134,7 @@
         const favBtn = document.createElement('button'); favBtn.className = `fav-btn ${isFavorite ? 'favorited' : ''}`; favBtn.innerHTML = isFavorite ? '⭐' : '☆'; favBtn.title = 'Favorite';
         favBtn.onclick = () => toggleFavorite(text, favBtn);
         actionsDiv.appendChild(copyBtn); actionsDiv.appendChild(favBtn); card.appendChild(textSpan); card.appendChild(actionsDiv);
-        container.appendChild(card); // Use appendChild to maintain order
+        container.appendChild(card);
     }
 
     function renderHistory(filter = '') {
@@ -231,6 +245,41 @@
             style: document.getElementById('image-style-select').value
         };
         performFetch('/generate-image', payload, true);
+    });
+
+    // --- UPLOAD LOGIC ---
+    uploadBtn.addEventListener('click', () => {
+        const file = fileInput.files[0];
+        if (!file) {
+            return alert('Παρακαλώ, επίλεξε πρώτα ένα αρχείο!');
+        }
+
+        spinnerContainer.style.display = 'flex';
+        generationResultsContainer.innerHTML = '';
+        
+        const formData = new FormData();
+        formData.append('file', file);
+
+        fetch('/upload-image', {
+            method: 'POST',
+            body: formData
+        })
+        .then(response => response.json())
+        .then(data => {
+            spinnerContainer.style.display = 'none';
+            if (data.image_url) {
+                const card = document.createElement('div');
+                card.id = 'image-result-card';
+                card.innerHTML = `<img src="${data.image_url}" alt="Uploaded Image">`;
+                generationResultsContainer.appendChild(card);
+            } else {
+                generationResultsContainer.innerHTML = `<div class="result-card">${data.error || 'Error during upload'}</div>`;
+            }
+        })
+        .catch(error => {
+            spinnerContainer.style.display = 'none';
+            generationResultsContainer.innerHTML = '<div class="result-card">Network error during upload.</div>';
+        });
     });
 
     // --- Other Listeners & Initial Load ---
