@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AI Social Media Assistant v2.0</title>
+    <title>AI Social Media Assistant v2.1</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
@@ -13,13 +13,14 @@
 
     <div class="container">
         <div class="theme-switch" id="theme-switch" title="Toggle dark mode">🌙</div>
-        <h1>AI Social Media Assistant v2.0</h1>
+        <h1>AI Social Media Assistant v2.1</h1>
 
         <div class="app-tabs">
             <button id="tab-text" class="active">Δημιουργία Κειμένου</button>
             <button id="tab-image">Δημιουργία Εικόνας</button>
+            <button id="tab-history">Ιστορικό & Αγαπημένα</button>
         </div>
-
+        
         <div id="view-text" class="view-container active">
             <p>Δημιούργησε Hooks, CTAs και Captions για τα social media σου.</p>
             <div class="form-controls">
@@ -71,127 +72,145 @@
             <button id="generate-image-btn">Δημιουργία Εικόνας</button>
         </div>
 
-        <div id="spinner-container" class="spinner-container"><div class="spinner"></div></div>
-        
-        <div class="history-controls">
-            <div class="tabs">
-                <button id="tab-history" class="active">Ιστορικό</button>
-                <button id="tab-favorites">Αγαπημένα</button>
+        <div id="view-history" class="view-container">
+             <div class="history-controls">
+                <div class="tabs">
+                    <button id="subtab-history" class="active">Ιστορικό</button>
+                    <button id="subtab-favorites">Αγαπημένα</button>
+                </div>
+                <input type="text" id="search-history" placeholder="Αναζήτηση...">
             </div>
-            <input type="text" id="search-history" placeholder="Αναζήτηση...">
+            <div id="history-results-container"></div>
         </div>
-        <div id="results-container"></div>
+
+        <div id="spinner-container" class="spinner-container"><div class="spinner"></div></div>
+        <div id="generation-results-container"></div>
     </div>
 
     <script>
     // --- DOM Elements ---
     const textTab = document.getElementById('tab-text');
     const imageTab = document.getElementById('tab-image');
+    const historyTab = document.getElementById('tab-history');
     const textView = document.getElementById('view-text');
     const imageView = document.getElementById('view-image');
+    const historyView = document.getElementById('view-history');
     const generateTextBtn = document.getElementById('generate-text-btn');
     const generateImageBtn = document.getElementById('generate-image-btn');
-    const resultsContainer = document.getElementById('results-container');
+    const generationResultsContainer = document.getElementById('generation-results-container');
+    const historyResultsContainer = document.getElementById('history-results-container');
     const spinnerContainer = document.getElementById('spinner-container');
     const themeSwitch = document.getElementById('theme-switch');
     const searchInput = document.getElementById('search-history');
-    const historyTab = document.getElementById('tab-history');
-    const favoritesTab = document.getElementById('tab-favorites');
+    const historySubTab = document.getElementById('subtab-history');
+    const favoritesSubTab = document.getElementById('subtab-favorites');
 
-    let currentView = 'history';
+    let currentHistoryView = 'history';
 
-    // --- Core Functions ---
+    // --- Core Functions (getStorage, setStorage, createResultCard, etc.) ---
     const getStorage = (key) => JSON.parse(localStorage.getItem(key)) || [];
     const setStorage = (key, value) => localStorage.setItem(key, JSON.stringify(value));
 
-    function createResultCard(captionText, isFavorite) {
-        const card = document.createElement('div');
-        card.className = 'result-card';
-        const textSpan = document.createElement('span');
-        textSpan.textContent = captionText.trim();
-        const actionsDiv = document.createElement('div');
-        actionsDiv.className = 'card-actions';
-        const copyBtn = document.createElement('button');
-        copyBtn.className = 'copy-btn';
-        copyBtn.innerHTML = '📋'; copyBtn.title = 'Copy';
-        copyBtn.onclick = () => {
-            navigator.clipboard.writeText(textSpan.textContent);
-            copyBtn.innerHTML = '✅';
-            setTimeout(() => { copyBtn.innerHTML = '📋'; }, 2000);
-        };
-        const favBtn = document.createElement('button');
-        favBtn.className = `fav-btn ${isFavorite ? 'favorited' : ''}`;
-        favBtn.innerHTML = isFavorite ? '⭐' : '☆'; favBtn.title = 'Favorite';
-        favBtn.onclick = () => toggleFavorite(captionText, favBtn);
-        actionsDiv.appendChild(copyBtn);
-        actionsDiv.appendChild(favBtn);
-        card.appendChild(textSpan);
-        card.appendChild(actionsDiv);
-        return card;
+    function createResultCard(text, isFavorite, container) {
+        const card = document.createElement('div'); card.className = 'result-card';
+        const textSpan = document.createElement('span'); textSpan.textContent = text.trim();
+        const actionsDiv = document.createElement('div'); actionsDiv.className = 'card-actions';
+        const copyBtn = document.createElement('button'); copyBtn.className = 'copy-btn'; copyBtn.innerHTML = '📋'; copyBtn.title = 'Copy';
+        copyBtn.onclick = () => { navigator.clipboard.writeText(textSpan.textContent); copyBtn.innerHTML = '✅'; setTimeout(() => { copyBtn.innerHTML = '📋'; }, 2000); };
+        const favBtn = document.createElement('button'); favBtn.className = `fav-btn ${isFavorite ? 'favorited' : ''}`; favBtn.innerHTML = isFavorite ? '⭐' : '☆'; favBtn.title = 'Favorite';
+        favBtn.onclick = () => toggleFavorite(text, favBtn);
+        actionsDiv.appendChild(copyBtn); actionsDiv.appendChild(favBtn); card.appendChild(textSpan); card.appendChild(actionsDiv);
+        container.appendChild(card); // Use appendChild to maintain order
     }
 
-    function renderResults(filter = '') {
-        resultsContainer.innerHTML = '';
+    function renderHistory(filter = '') {
+        historyResultsContainer.innerHTML = '';
         const favorites = getStorage('favorites');
-        const items = (currentView === 'history') ? getStorage('history') : favorites;
+        const items = (currentHistoryView === 'history') ? getStorage('history') : favorites;
         const filteredItems = items.filter(item => item.toLowerCase().includes(filter.toLowerCase()));
         filteredItems.forEach(item => {
             const isFav = favorites.includes(item);
-            const card = createResultCard(item, isFav);
-            resultsContainer.appendChild(card);
+            createResultCard(item, isFav, historyResultsContainer);
         });
     }
 
     function saveToHistory(newCaptions) {
         let history = getStorage('history');
-        history = [...newCaptions.reverse(), ...history];
+        history = [...newCaptions, ...history];
         if (history.length > 50) history = history.slice(0, 50);
         setStorage('history', history);
     }
 
     function toggleFavorite(captionText, btn) {
         let favorites = getStorage('favorites');
-        const index = favorites.indexOf(captionText);
-        if (index > -1) {
-            favorites.splice(index, 1);
-            btn.classList.remove('favorited');
-            btn.innerHTML = '☆';
+        if (favorites.includes(captionText)) {
+            favorites = favorites.filter(fav => fav !== captionText);
+            btn.classList.remove('favorited'); btn.innerHTML = '☆';
         } else {
             favorites.unshift(captionText);
-            btn.classList.add('favorited');
-            btn.innerHTML = '⭐';
+            btn.classList.add('favorited'); btn.innerHTML = '⭐';
         }
         setStorage('favorites', favorites);
-        if (currentView === 'favorites') renderResults();
+        renderHistory(searchInput.value);
     }
 
     // --- Tab Switching Logic ---
-    textTab.addEventListener('click', () => {
-        textTab.classList.add('active');
-        imageTab.classList.remove('active');
-        textView.classList.add('active');
-        imageView.classList.remove('active');
-        historyControls.style.display = 'flex'; // Show history for text
-    });
+    function switchTab(activeTab, activeView) {
+        [textTab, imageTab, historyTab].forEach(tab => tab.classList.remove('active'));
+        [textView, imageView, historyView].forEach(view => view.classList.remove('active'));
+        activeTab.classList.add('active');
+        activeView.classList.add('active');
+        generationResultsContainer.innerHTML = '';
+        if (activeTab === historyTab) renderHistory(searchInput.value);
+    }
+    textTab.addEventListener('click', () => switchTab(textTab, textView));
+    imageTab.addEventListener('click', () => switchTab(imageTab, imageView));
+    historyTab.addEventListener('click', () => switchTab(historyTab, historyView));
+    historySubTab.addEventListener('click', () => { currentHistoryView = 'history'; historySubTab.classList.add('active'); favoritesSubTab.classList.remove('active'); renderHistory(searchInput.value); });
+    favoritesSubTab.addEventListener('click', () => { currentHistoryView = 'favorites'; favoritesSubTab.classList.add('active'); historySubTab.classList.remove('active'); renderHistory(searchInput.value); });
 
-    imageTab.addEventListener('click', () => {
-        imageTab.classList.add('active');
-        textTab.classList.remove('active');
-        imageView.classList.add('active');
-        textView.classList.remove('active');
-        historyControls.style.display = 'none'; // Hide history for images for now
-        resultsContainer.innerHTML = ''; // Clear results when switching
-    });
+    // --- API Call Logic ---
+    function performFetch(endpoint, payload, isImage = false) {
+        spinnerContainer.style.display = 'flex';
+        generationResultsContainer.innerHTML = '';
+        fetch(endpoint, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(payload)
+        })
+        .then(response => response.json())
+        .then(data => {
+            spinnerContainer.style.display = 'none';
+            if (isImage) {
+                if (data.image_url) {
+                    const card = document.createElement('div');
+                    card.id = 'image-result-card';
+                    card.innerHTML = `<img src="${data.image_url}" alt="Generated Image">`;
+                    generationResultsContainer.appendChild(card);
+                } else {
+                    generationResultsContainer.innerHTML = `<div class="result-card">${data.error || 'Error'}</div>`;
+                }
+            } else {
+                if (data.caption) {
+                    const newCaptions = data.caption.split(/\d+\./).filter(Boolean).map(s => s.trim());
+                    saveToHistory(newCaptions);
+                    const favorites = getStorage('favorites');
+                    newCaptions.forEach(cap => createResultCard(cap, favorites.includes(cap), generationResultsContainer));
+                } else {
+                    generationResultsContainer.innerHTML = `<div class="result-card">${data.error || 'Error'}</div>`;
+                }
+            }
+        })
+        .catch(error => {
+            spinnerContainer.style.display = 'none';
+            generationResultsContainer.innerHTML = '<div class="result-card">Network error.</div>';
+        });
+    }
 
-
-    // --- Event Listener for Text Generation ---
+    // --- Event Listeners for Buttons ---
     generateTextBtn.addEventListener('click', () => {
         const topic = document.getElementById('topic-input').value;
         if (!topic) return alert('Παρακαλώ, γράψε ένα θέμα!');
-        
-        spinnerContainer.style.display = 'flex';
-        resultsContainer.style.display = 'none';
-        
         const payload = {
             topic: topic,
             keywords: document.getElementById('keywords').value,
@@ -201,76 +220,20 @@
             language: document.getElementById('language-select').value,
             model_choice: document.getElementById('model-select').value
         };
-
-        fetch('/generate-caption', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(payload)
-        })
-        .then(response => response.json())
-        .then(data => {
-            spinnerContainer.style.display = 'none';
-            resultsContainer.style.display = 'block';
-
-            if (data.caption) {
-                const newCaptions = data.caption.split(/\d+\./).filter(Boolean).map(s => s.trim());
-                saveToHistory(newCaptions);
-                historyTab.click();
-            } else {
-                resultsContainer.innerHTML = `<div class="result-card">${data.error || 'Error'}</div>`;
-            }
-        })
-        .catch(error => {
-            spinnerContainer.style.display = 'none';
-            resultsContainer.style.display = 'block';
-            resultsContainer.innerHTML = '<div class="result-card">Network error.</div>';
-        });
+        performFetch('/generate-caption', payload, false);
     });
 
-    // --- Event Listener for Image Generation ---
     generateImageBtn.addEventListener('click', () => {
         const prompt = document.getElementById('image-prompt-input').value;
         if (!prompt) return alert('Παρακαλώ, δώσε μια περιγραφή για την εικόνα!');
-
-        spinnerContainer.style.display = 'flex';
-        resultsContainer.innerHTML = '';
-        resultsContainer.style.display = 'none';
-
         const payload = {
             prompt: prompt,
             style: document.getElementById('image-style-select').value
         };
-
-        fetch('/generate-image', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(payload)
-        })
-        .then(response => response.json())
-        .then(data => {
-            spinnerContainer.style.display = 'none';
-            resultsContainer.style.display = 'block';
-
-            if (data.image_url) {
-                const card = document.createElement('div');
-                card.id = 'image-result-card';
-                card.innerHTML = `<img src="${data.image_url}" alt="Generated Image">`;
-                resultsContainer.innerHTML = ''; // Clear previous results
-                resultsContainer.appendChild(card);
-            } else {
-                resultsContainer.innerHTML = `<div class="result-card">${data.error || 'Error'}</div>`;
-            }
-        })
-        .catch(error => {
-             spinnerContainer.style.display = 'none';
-             resultsContainer.style.display = 'block';
-             resultsContainer.innerHTML = '<div class="result-card">Network error.</div>';
-        });
+        performFetch('/generate-image', payload, true);
     });
 
-
-    // --- Other Event Listeners ---
-    const historyControls = document.querySelector('.history-controls');
+    // --- Other Listeners & Initial Load ---
     themeSwitch.addEventListener('click', () => {
         document.body.classList.toggle('dark-mode');
         if (document.body.classList.contains('dark-mode')) {
@@ -282,23 +245,8 @@
         }
     });
     
-    searchInput.addEventListener('input', (e) => renderResults(e.target.value));
-
-    historyTab.addEventListener('click', () => {
-        currentView = 'history';
-        historyTab.classList.add('active');
-        favoritesTab.classList.remove('active');
-        renderResults(searchInput.value);
-    });
-
-    favoritesTab.addEventListener('click', () => {
-        currentView = 'favorites';
-        favoritesTab.classList.add('active');
-        historyTab.classList.remove('active');
-        renderResults(searchInput.value);
-    });
-
-    // --- Initial Load ---
+    searchInput.addEventListener('input', (e) => renderHistory(e.target.value));
+    
     document.addEventListener('DOMContentLoaded', () => {
         if (localStorage.getItem('theme') === 'dark') {
             document.body.classList.add('dark-mode');
