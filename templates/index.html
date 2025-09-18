@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AI Social Media Assistant</title>
+    <title>AI Social Media Assistant v2.0</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
@@ -13,49 +13,66 @@
 
     <div class="container">
         <div class="theme-switch" id="theme-switch" title="Toggle dark mode">🌙</div>
-        <h1>AI Social Media Assistant</h1>
-        <p>Δημιούργησε Hooks, CTAs και Captions για τα social media σου σε δευτερόλεπτα.</p>
+        <h1>AI Social Media Assistant v2.0</h1>
 
-        <div class="form-controls">
-            <input type="text" id="topic-input" placeholder="Κύριο θέμα...">
-            <input type="text" id="keywords" placeholder="Λέξεις-κλειδιά...">
-            
-            <select id="platform-select">
-                <option value="Instagram">Instagram</option>
-                <option value="TikTok">TikTok</option>
-                <option value="Facebook">Facebook</option>
-                <option value="Pinterest">Pinterest</option>
-                <option value="YouTube">YouTube</option>
-            </select>
-            
-            <select id="content-type-select">
-                <option value="Caption">Full Caption</option>
-                <option value="Hook">Μόνο Hook</option>
-                <option value="CTA">Μόνο CTA</option>
-                <option value="Hashtags">Μόνο Hashtags</option>
-            </select>
-
-            <select id="tone-select">
-                <option value="Friendly">Φιλικό</option>
-                <option value="Professional">Επαγγελματικό</option>
-                <option value="Funny">Αστείο</option>
-                <option value="Enthusiastic">Ενθουσιώδες</option>
-            </select>
-
-            <select id="language-select">
-                <option value="Greek">Ελληνικά</option>
-                <option value="English">Αγγλικά</option>
-            </select>
-            
-            <select id="model-select" title="Choose your AI engine">
-                <option value="openai">OpenAI (GPT-3.5)</option>
-                <option value="gemini">Google (Gemini)</option>
-            </select>
+        <div class="app-tabs">
+            <button id="tab-text" class="active">Δημιουργία Κειμένου</button>
+            <button id="tab-image">Δημιουργία Εικόνας</button>
         </div>
 
-        <button id="generate-btn">Δημιουργία Περιεχομένου</button>
+        <div id="view-text" class="view-container active">
+            <p>Δημιούργησε Hooks, CTAs και Captions για τα social media σου.</p>
+            <div class="form-controls">
+                <input type="text" id="topic-input" placeholder="Κύριο θέμα...">
+                <input type="text" id="keywords" placeholder="Λέξεις-κλειδιά...">
+                <select id="platform-select">
+                    <option value="Instagram">Instagram</option>
+                    <option value="TikTok">TikTok</option>
+                    <option value="Facebook">Facebook</option>
+                    <option value="Pinterest">Pinterest</option>
+                    <option value="YouTube">YouTube</option>
+                </select>
+                <select id="content-type-select">
+                    <option value="Caption">Full Caption</option>
+                    <option value="Hook">Μόνο Hook</option>
+                    <option value="CTA">Μόνο CTA</option>
+                    <option value="Hashtags">Μόνο Hashtags</option>
+                </select>
+                <select id="tone-select">
+                    <option value="Friendly">Φιλικό</option>
+                    <option value="Professional">Επαγγελματικό</option>
+                    <option value="Funny">Αστείο</option>
+                    <option value="Enthusiastic">Ενθουσιώδες</option>
+                </select>
+                <select id="language-select">
+                    <option value="Greek">Ελληνικά</option>
+                    <option value="English">Αγγλικά</option>
+                </select>
+                <select id="model-select" title="Choose your AI engine">
+                    <option value="openai">OpenAI (GPT-3.5)</option>
+                    <option value="gemini">Google (Gemini)</option>
+                </select>
+            </div>
+            <button id="generate-text-btn">Δημιουργία Κειμένου</button>
+        </div>
+
+        <div id="view-image" class="view-container">
+            <p>Περιέγραψε την εικόνα που θέλεις να δημιουργήσεις.</p>
+            <div class="form-controls">
+                <input type="text" id="image-prompt-input" placeholder="π.χ., Ένας αστροναύτης σε μια παραλία, ρεαλιστικό στυλ...">
+                <select id="image-style-select">
+                    <option value="photorealistic">Φωτορεαλιστικό</option>
+                    <option value="digital art">Digital Art</option>
+                    <option value="cartoon">Cartoon</option>
+                    <option value="fantasy">Fantasy</option>
+                    <option value="3d render">3D Render</option>
+                </select>
+            </div>
+            <button id="generate-image-btn">Δημιουργία Εικόνας</button>
+        </div>
 
         <div id="spinner-container" class="spinner-container"><div class="spinner"></div></div>
+        
         <div class="history-controls">
             <div class="tabs">
                 <button id="tab-history" class="active">Ιστορικό</button>
@@ -67,149 +84,228 @@
     </div>
 
     <script>
-        // --- Event Listener for Generate Button ---
-        document.getElementById('generate-btn').addEventListener('click', () => {
-            const topic = document.getElementById('topic-input').value;
-            if (!topic) return alert('Παρακαλώ, γράψε ένα θέμα!');
-            
-            document.getElementById('spinner-container').style.display = 'flex';
-            document.getElementById('results-container').style.display = 'none';
-            
-            // Collect all form values, including the new model choice
-            const payload = {
-                topic: topic,
-                keywords: document.getElementById('keywords').value,
-                platform: document.getElementById('platform-select').value,
-                contentType: document.getElementById('content-type-select').value,
-                tone: document.getElementById('tone-select').value,
-                language: document.getElementById('language-select').value,
-                model_choice: document.getElementById('model-select').value
-            };
+    // --- DOM Elements ---
+    const textTab = document.getElementById('tab-text');
+    const imageTab = document.getElementById('tab-image');
+    const textView = document.getElementById('view-text');
+    const imageView = document.getElementById('view-image');
+    const generateTextBtn = document.getElementById('generate-text-btn');
+    const generateImageBtn = document.getElementById('generate-image-btn');
+    const resultsContainer = document.getElementById('results-container');
+    const spinnerContainer = document.getElementById('spinner-container');
+    const themeSwitch = document.getElementById('theme-switch');
+    const searchInput = document.getElementById('search-history');
+    const historyTab = document.getElementById('tab-history');
+    const favoritesTab = document.getElementById('tab-favorites');
 
-            // The rest of the JavaScript remains the same as before
-            fetch('/generate-caption', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(payload)
-            })
-            .then(response => response.json())
-            .then(data => {
-                document.getElementById('spinner-container').style.display = 'none';
-                document.getElementById('results-container').style.display = 'block';
+    let currentView = 'history';
 
-                if (data.caption) {
-                    const newCaptions = data.caption.split(/\d+\./).filter(Boolean).map(s => s.trim());
-                    saveToHistory(newCaptions);
-                    document.getElementById('tab-history').click();
-                } else {
-                    document.getElementById('results-container').innerHTML = `<div class="result-card">${data.error || 'Error'}</div>`;
-                }
-            })
-            .catch(error => {
-                document.getElementById('spinner-container').style.display = 'none';
-                document.getElementById('results-container').style.display = 'block';
-                document.getElementById('results-container').innerHTML = '<div class="result-card">Network error.</div>';
-            });
+    // --- Core Functions ---
+    const getStorage = (key) => JSON.parse(localStorage.getItem(key)) || [];
+    const setStorage = (key, value) => localStorage.setItem(key, JSON.stringify(value));
+
+    function createResultCard(captionText, isFavorite) {
+        const card = document.createElement('div');
+        card.className = 'result-card';
+        const textSpan = document.createElement('span');
+        textSpan.textContent = captionText.trim();
+        const actionsDiv = document.createElement('div');
+        actionsDiv.className = 'card-actions';
+        const copyBtn = document.createElement('button');
+        copyBtn.className = 'copy-btn';
+        copyBtn.innerHTML = '📋'; copyBtn.title = 'Copy';
+        copyBtn.onclick = () => {
+            navigator.clipboard.writeText(textSpan.textContent);
+            copyBtn.innerHTML = '✅';
+            setTimeout(() => { copyBtn.innerHTML = '📋'; }, 2000);
+        };
+        const favBtn = document.createElement('button');
+        favBtn.className = `fav-btn ${isFavorite ? 'favorited' : ''}`;
+        favBtn.innerHTML = isFavorite ? '⭐' : '☆'; favBtn.title = 'Favorite';
+        favBtn.onclick = () => toggleFavorite(captionText, favBtn);
+        actionsDiv.appendChild(copyBtn);
+        actionsDiv.appendChild(favBtn);
+        card.appendChild(textSpan);
+        card.appendChild(actionsDiv);
+        return card;
+    }
+
+    function renderResults(filter = '') {
+        resultsContainer.innerHTML = '';
+        const favorites = getStorage('favorites');
+        const items = (currentView === 'history') ? getStorage('history') : favorites;
+        const filteredItems = items.filter(item => item.toLowerCase().includes(filter.toLowerCase()));
+        filteredItems.forEach(item => {
+            const isFav = favorites.includes(item);
+            const card = createResultCard(item, isFav);
+            resultsContainer.appendChild(card);
         });
+    }
 
-        // --- All other JavaScript functions (history, favorites, dark mode etc.) remain unchanged ---
-        const resultsContainer = document.getElementById('results-container');
-        const themeSwitch = document.getElementById('theme-switch');
-        const searchInput = document.getElementById('search-history');
-        const historyTab = document.getElementById('tab-history');
-        const favoritesTab = document.getElementById('tab-favorites');
-        let currentView = 'history';
-        const getStorage = (key) => JSON.parse(localStorage.getItem(key)) || [];
-        const setStorage = (key, value) => localStorage.setItem(key, JSON.stringify(value));
-        function createResultCard(captionText, isFavorite) {
-            const card = document.createElement('div');
-            card.className = 'result-card';
-            const textSpan = document.createElement('span');
-            textSpan.textContent = captionText.trim();
-            const actionsDiv = document.createElement('div');
-            actionsDiv.className = 'card-actions';
-            const copyBtn = document.createElement('button');
-            copyBtn.className = 'copy-btn';
-            copyBtn.innerHTML = '📋';
-            copyBtn.title = 'Copy';
-            copyBtn.onclick = () => {
-                navigator.clipboard.writeText(textSpan.textContent);
-                copyBtn.innerHTML = '✅';
-                setTimeout(() => { copyBtn.innerHTML = '📋'; }, 2000);
-            };
-            const favBtn = document.createElement('button');
-            favBtn.className = `fav-btn ${isFavorite ? 'favorited' : ''}`;
-            favBtn.innerHTML = isFavorite ? '⭐' : '☆';
-            favBtn.title = 'Favorite';
-            favBtn.onclick = () => toggleFavorite(captionText, favBtn);
-            actionsDiv.appendChild(copyBtn);
-            actionsDiv.appendChild(favBtn);
-            card.appendChild(textSpan);
-            card.appendChild(actionsDiv);
-            return card;
+    function saveToHistory(newCaptions) {
+        let history = getStorage('history');
+        history = [...newCaptions.reverse(), ...history];
+        if (history.length > 50) history = history.slice(0, 50);
+        setStorage('history', history);
+    }
+
+    function toggleFavorite(captionText, btn) {
+        let favorites = getStorage('favorites');
+        const index = favorites.indexOf(captionText);
+        if (index > -1) {
+            favorites.splice(index, 1);
+            btn.classList.remove('favorited');
+            btn.innerHTML = '☆';
+        } else {
+            favorites.unshift(captionText);
+            btn.classList.add('favorited');
+            btn.innerHTML = '⭐';
         }
-        function renderResults(filter = '') {
-            resultsContainer.innerHTML = '';
-            const favorites = getStorage('favorites');
-            const items = (currentView === 'history') ? getStorage('history') : favorites;
-            const filteredItems = items.filter(item => item.toLowerCase().includes(filter.toLowerCase()));
-            filteredItems.forEach(item => {
-                const isFav = favorites.includes(item);
-                const card = createResultCard(item, isFav);
+        setStorage('favorites', favorites);
+        if (currentView === 'favorites') renderResults();
+    }
+
+    // --- Tab Switching Logic ---
+    textTab.addEventListener('click', () => {
+        textTab.classList.add('active');
+        imageTab.classList.remove('active');
+        textView.classList.add('active');
+        imageView.classList.remove('active');
+        historyControls.style.display = 'flex'; // Show history for text
+    });
+
+    imageTab.addEventListener('click', () => {
+        imageTab.classList.add('active');
+        textTab.classList.remove('active');
+        imageView.classList.add('active');
+        textView.classList.remove('active');
+        historyControls.style.display = 'none'; // Hide history for images for now
+        resultsContainer.innerHTML = ''; // Clear results when switching
+    });
+
+
+    // --- Event Listener for Text Generation ---
+    generateTextBtn.addEventListener('click', () => {
+        const topic = document.getElementById('topic-input').value;
+        if (!topic) return alert('Παρακαλώ, γράψε ένα θέμα!');
+        
+        spinnerContainer.style.display = 'flex';
+        resultsContainer.style.display = 'none';
+        
+        const payload = {
+            topic: topic,
+            keywords: document.getElementById('keywords').value,
+            platform: document.getElementById('platform-select').value,
+            contentType: document.getElementById('content-type-select').value,
+            tone: document.getElementById('tone-select').value,
+            language: document.getElementById('language-select').value,
+            model_choice: document.getElementById('model-select').value
+        };
+
+        fetch('/generate-caption', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(payload)
+        })
+        .then(response => response.json())
+        .then(data => {
+            spinnerContainer.style.display = 'none';
+            resultsContainer.style.display = 'block';
+
+            if (data.caption) {
+                const newCaptions = data.caption.split(/\d+\./).filter(Boolean).map(s => s.trim());
+                saveToHistory(newCaptions);
+                historyTab.click();
+            } else {
+                resultsContainer.innerHTML = `<div class="result-card">${data.error || 'Error'}</div>`;
+            }
+        })
+        .catch(error => {
+            spinnerContainer.style.display = 'none';
+            resultsContainer.style.display = 'block';
+            resultsContainer.innerHTML = '<div class="result-card">Network error.</div>';
+        });
+    });
+
+    // --- Event Listener for Image Generation ---
+    generateImageBtn.addEventListener('click', () => {
+        const prompt = document.getElementById('image-prompt-input').value;
+        if (!prompt) return alert('Παρακαλώ, δώσε μια περιγραφή για την εικόνα!');
+
+        spinnerContainer.style.display = 'flex';
+        resultsContainer.innerHTML = '';
+        resultsContainer.style.display = 'none';
+
+        const payload = {
+            prompt: prompt,
+            style: document.getElementById('image-style-select').value
+        };
+
+        fetch('/generate-image', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(payload)
+        })
+        .then(response => response.json())
+        .then(data => {
+            spinnerContainer.style.display = 'none';
+            resultsContainer.style.display = 'block';
+
+            if (data.image_url) {
+                const card = document.createElement('div');
+                card.id = 'image-result-card';
+                card.innerHTML = `<img src="${data.image_url}" alt="Generated Image">`;
+                resultsContainer.innerHTML = ''; // Clear previous results
                 resultsContainer.appendChild(card);
-            });
-        }
-        function saveToHistory(newCaptions) {
-            let history = getStorage('history');
-            history = [...newCaptions.reverse(), ...history];
-            if (history.length > 50) history = history.slice(0, 50);
-            setStorage('history', history);
-        }
-        function toggleFavorite(captionText, btn) {
-            let favorites = getStorage('favorites');
-            const index = favorites.indexOf(captionText);
-            if (index > -1) {
-                favorites.splice(index, 1);
-                btn.classList.remove('favorited');
-                btn.innerHTML = '☆';
             } else {
-                favorites.unshift(captionText);
-                btn.classList.add('favorited');
-                btn.innerHTML = '⭐';
+                resultsContainer.innerHTML = `<div class="result-card">${data.error || 'Error'}</div>`;
             }
-            setStorage('favorites', favorites);
-            if (currentView === 'favorites') renderResults();
+        })
+        .catch(error => {
+             spinnerContainer.style.display = 'none';
+             resultsContainer.style.display = 'block';
+             resultsContainer.innerHTML = '<div class="result-card">Network error.</div>';
+        });
+    });
+
+
+    // --- Other Event Listeners ---
+    const historyControls = document.querySelector('.history-controls');
+    themeSwitch.addEventListener('click', () => {
+        document.body.classList.toggle('dark-mode');
+        if (document.body.classList.contains('dark-mode')) {
+            localStorage.setItem('theme', 'dark');
+            themeSwitch.textContent = '☀️';
+        } else {
+            localStorage.setItem('theme', 'light');
+            themeSwitch.textContent = '🌙';
         }
-        themeSwitch.addEventListener('click', () => {
-            document.body.classList.toggle('dark-mode');
-            if (document.body.classList.contains('dark-mode')) {
-                localStorage.setItem('theme', 'dark');
-                themeSwitch.textContent = '☀️';
-            } else {
-                localStorage.setItem('theme', 'light');
-                themeSwitch.textContent = '🌙';
-            }
-        });
-        searchInput.addEventListener('input', (e) => renderResults(e.target.value));
-        historyTab.addEventListener('click', () => {
-            currentView = 'history';
-            historyTab.classList.add('active');
-            favoritesTab.classList.remove('active');
-            renderResults(searchInput.value);
-        });
-        favoritesTab.addEventListener('click', () => {
-            currentView = 'favorites';
-            favoritesTab.classList.add('active');
-            historyTab.classList.remove('active');
-            renderResults(searchInput.value);
-        });
-        document.addEventListener('DOMContentLoaded', () => {
-            if (localStorage.getItem('theme') === 'dark') {
-                document.body.classList.add('dark-mode');
-                themeSwitch.textContent = '☀️';
-            }
-            historyTab.click();
-        });
+    });
+    
+    searchInput.addEventListener('input', (e) => renderResults(e.target.value));
+
+    historyTab.addEventListener('click', () => {
+        currentView = 'history';
+        historyTab.classList.add('active');
+        favoritesTab.classList.remove('active');
+        renderResults(searchInput.value);
+    });
+
+    favoritesTab.addEventListener('click', () => {
+        currentView = 'favorites';
+        favoritesTab.classList.add('active');
+        historyTab.classList.remove('active');
+        renderResults(searchInput.value);
+    });
+
+    // --- Initial Load ---
+    document.addEventListener('DOMContentLoaded', () => {
+        if (localStorage.getItem('theme') === 'dark') {
+            document.body.classList.add('dark-mode');
+            themeSwitch.textContent = '☀️';
+        }
+        textTab.click(); // Start on the text tab
+    });
     </script>
 </body>
 </html>
