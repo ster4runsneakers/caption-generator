@@ -1,4 +1,81 @@
-/* --- ## NEW STYLES FOR V2 TABS ## --- */
+/* --- CSS Variables for Theming (Light & Dark Mode) --- */
+:root {
+    --bg-gradient-start: #f0f4f8;
+    --bg-gradient-end: #d9e2ec;
+    --container-bg: white;
+    --text-primary: #2c3e50;
+    --text-secondary: #7f8c8d;
+    --border-color: #dfe6e9;
+    --input-bg: #f8fafc;
+    --card-bg: #f8fafc;
+    --card-border: #e2e8f0;
+    --shadow-color: rgba(0, 0, 0, 0.1);
+    --button-secondary-bg: #dbe4ee;
+    --button-secondary-text: #556a81;
+}
+
+body.dark-mode {
+    --bg-gradient-start: #2c3e50;
+    --bg-gradient-end: #1a252f;
+    --container-bg: #2c3e50;
+    --text-primary: #ecf0f1;
+    --text-secondary: #95a5a6;
+    --border-color: #4a6278;
+    --input-bg: #34495e;
+    --card-bg: #34495e;
+    --card-border: #4a6278;
+    --shadow-color: rgba(0, 0, 0, 0.4);
+    --button-secondary-bg: #4a6278;
+    --button-secondary-text: #ecf0f1;
+}
+
+/* --- General Style & Background --- */
+body {
+    font-family: 'Poppins', sans-serif;
+    background: linear-gradient(110deg, var(--bg-gradient-start), var(--bg-gradient-end));
+    color: var(--text-primary);
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    min-height: 100vh;
+    padding: 50px 15px;
+    margin: 0;
+    transition: background 0.3s, color 0.3s;
+}
+
+/* --- Main Container & Theme Switch --- */
+.container {
+    background-color: var(--container-bg);
+    padding: 40px;
+    border-radius: 16px;
+    box-shadow: 0 8px 32px var(--shadow-color);
+    width: 90%;
+    max-width: 700px;
+    text-align: center;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    position: relative;
+    transition: background-color 0.3s;
+}
+
+.theme-switch {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    cursor: pointer;
+    font-size: 24px;
+}
+
+h1 {
+    color: var(--text-primary);
+    font-weight: 600;
+}
+
+p {
+    color: var(--text-secondary);
+    margin-bottom: 30px;
+}
+
+/* --- Main App Tabs --- */
 .app-tabs {
     display: flex;
     border-bottom: 2px solid var(--border-color);
@@ -31,16 +108,176 @@
     display: block; /* We show only the active one */
 }
 
-#image-result-card {
+/* --- Form Controls Layout --- */
+.form-controls {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 15px;
+    margin-bottom: 20px;
+}
+
+.form-controls input[type="text"],
+.form-controls select {
+    width: 100%; /* Default width for mobile */
+    padding: 12px 15px;
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    font-size: 16px;
+    box-sizing: border-box;
+    background-color: var(--input-bg);
+    color: var(--text-primary);
+    transition: border-color 0.3s, box-shadow 0.3s, background-color 0.3s, color 0.3s;
+}
+
+.form-controls input[type="text"] {
+    flex: 2 1 250px; /* Grow more, base width 250px */
+}
+
+.form-controls select {
+    flex: 1 1 150px; /* Grow less, base width 150px */
+}
+
+
+input:focus, select:focus {
+    outline: none;
+    border-color: #3498db;
+    box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.2);
+}
+
+/* --- Generate Buttons --- */
+.view-container button {
+    background: linear-gradient(45deg, #3498db, #2980b9);
+    color: white;
+    border: none;
+    padding: 14px 28px;
+    border-radius: 8px;
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: transform 0.2s, box-shadow 0.2s;
+    width: 100%;
+}
+
+.view-container button:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(52, 152, 219, 0.3);
+}
+
+/* --- Results Area --- */
+#generation-results-container, #history-results-container {
+    margin-top: 30px;
+    text-align: left;
+}
+
+.result-card {
     background-color: var(--card-bg);
     border: 1px solid var(--card-border);
     border-radius: 12px;
-    padding: 10px;
+    padding: 20px;
     margin-bottom: 15px;
+    position: relative;
+    line-height: 1.6;
+    white-space: pre-wrap;
+    font-size: 15px;
+    transition: background-color 0.3s, border-color 0.3s;
+}
+
+#image-result-card {
+    padding: 10px;
     text-align: center;
 }
 
 #image-result-card img {
     max-width: 100%;
     border-radius: 8px;
+}
+
+.card-actions {
+    position: absolute;
+    top: 15px;
+    right: 15px;
+    display: flex;
+    gap: 8px;
+}
+
+.copy-btn, .fav-btn {
+    background-color: var(--button-secondary-bg);
+    color: var(--button-secondary-text);
+    border: none;
+    border-radius: 6px;
+    padding: 6px 10px;
+    cursor: pointer;
+    transition: background-color 0.3s, color 0.3s, transform 0.2s;
+    font-size: 18px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.copy-btn:hover, .fav-btn:hover {
+    background-color: #3498db;
+    color: white;
+    transform: scale(1.1);
+}
+
+.fav-btn.favorited {
+    background-color: #f1c40f;
+    color: white;
+}
+
+/* --- History/Favorites Tabs & Search --- */
+.history-controls {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 15px;
+    border-bottom: 2px solid var(--border-color);
+    padding-bottom: 10px;
+}
+
+.history-controls .tabs button {
+    background: none;
+    border: none;
+    font-size: 18px;
+    padding: 5px 15px;
+    cursor: pointer;
+    color: var(--text-secondary);
+    border-bottom: 3px solid transparent;
+    transition: color 0.3s, border-color 0.3s;
+}
+
+.history-controls .tabs button.active {
+    color: var(--text-primary);
+    border-bottom: 3px solid #3498db;
+}
+
+#search-history {
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    padding: 8px 12px;
+    font-size: 14px;
+    background-color: var(--input-bg);
+    color: var(--text-primary);
+    width: 200px;
+}
+
+/* --- Spinner --- */
+.spinner-container {
+    display: none;
+    min-height: 150px;
+    justify-content: center;
+    align-items: center;
+}
+.spinner {
+    border: 6px solid #f3f3f3;
+    border-top: 6px solid #3498db;
+    border-radius: 50%;
+    width: 50px;
+    height: 50px;
+    animation: spin 1s linear infinite;
+}
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
 }
