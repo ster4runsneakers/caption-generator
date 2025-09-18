@@ -10,8 +10,8 @@
     --card-bg: #f8fafc;
     --card-border: #e2e8f0;
     --shadow-color: rgba(0, 0, 0, 0.1);
-    --button-secondary-bg: #dbe4ee;
-    --button-secondary-text: #556a81;
+    --button-secondary-bg: #e2e8f0;
+    --button-secondary-text: #5f6f81;
 }
 
 body.dark-mode {
@@ -38,7 +38,7 @@ body {
     justify-content: center;
     align-items: flex-start;
     min-height: 100vh;
-    padding: 50px 15px;
+    padding: 20px 15px;
     margin: 0;
     transition: background 0.3s, color 0.3s;
 }
@@ -46,10 +46,10 @@ body {
 /* --- Main Container & Theme Switch --- */
 .container {
     background-color: var(--container-bg);
-    padding: 40px;
+    padding: 30px;
     border-radius: 16px;
     box-shadow: 0 8px 32px var(--shadow-color);
-    width: 90%;
+    width: 100%;
     max-width: 700px;
     text-align: center;
     border: 1px solid rgba(255, 255, 255, 0.1);
@@ -59,15 +59,25 @@ body {
 
 .theme-switch {
     position: absolute;
-    top: 20px;
-    right: 20px;
+    top: 15px;
+    right: 15px;
     cursor: pointer;
-    font-size: 24px;
+    font-size: 22px;
 }
 
 h1 {
     color: var(--text-primary);
     font-weight: 600;
+    font-size: 28px;
+}
+
+h3 {
+    color: var(--text-primary);
+    font-size: 18px;
+    margin-top: 0;
+    margin-bottom: 15px;
+    font-weight: 600;
+    text-align: left;
 }
 
 p {
@@ -85,13 +95,14 @@ p {
 .app-tabs button {
     background: none;
     border: none;
-    padding: 15px 25px;
-    font-size: 18px;
+    padding: 15px 10px;
+    font-size: 16px;
     font-weight: 600;
     cursor: pointer;
     color: var(--text-secondary);
     border-bottom: 4px solid transparent;
     transition: color 0.3s, border-color 0.3s;
+    flex-grow: 1;
 }
 
 .app-tabs button.active {
@@ -100,13 +111,8 @@ p {
 }
 
 /* --- View Containers --- */
-.view-container {
-    display: none; /* All views are hidden by default */
-}
-
-.view-container.active {
-    display: block; /* We show only the active one */
-}
+.view-container { display: none; }
+.view-container.active { display: block; }
 
 /* --- Form Controls Layout --- */
 .form-controls {
@@ -118,7 +124,7 @@ p {
 
 .form-controls input[type="text"],
 .form-controls select {
-    width: 100%; /* Default width for mobile */
+    width: 100%;
     padding: 12px 15px;
     border: 1px solid var(--border-color);
     border-radius: 8px;
@@ -129,14 +135,8 @@ p {
     transition: border-color 0.3s, box-shadow 0.3s, background-color 0.3s, color 0.3s;
 }
 
-.form-controls input[type="text"] {
-    flex: 2 1 250px; /* Grow more, base width 250px */
-}
-
-.form-controls select {
-    flex: 1 1 150px; /* Grow less, base width 150px */
-}
-
+.form-controls input[type="text"] { flex: 2 1 250px; }
+.form-controls select { flex: 1 1 150px; }
 
 input:focus, select:focus {
     outline: none;
@@ -144,7 +144,7 @@ input:focus, select:focus {
     box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.2);
 }
 
-/* --- Generate Buttons --- */
+/* --- Generate & Upload Buttons --- */
 .view-container button {
     background: linear-gradient(45deg, #3498db, #2980b9);
     color: white;
@@ -163,6 +163,49 @@ input:focus, select:focus {
     box-shadow: 0 6px 20px rgba(52, 152, 219, 0.3);
 }
 
+/* --- Image View Sections --- */
+.form-section {
+    background-color: var(--card-bg);
+    border: 1px solid var(--card-border);
+    border-radius: 12px;
+    padding: 20px;
+    margin-bottom: 25px;
+    transition: background-color 0.3s, border-color 0.3s;
+}
+
+.upload-section {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 15px;
+}
+
+input[type="file"] {
+    display: none; /* Hide the default input */
+}
+
+.file-label {
+    background-color: var(--button-secondary-bg);
+    color: var(--button-secondary-text);
+    padding: 12px 20px;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: background-color 0.3s, color 0.3s;
+    text-align: center;
+    flex-grow: 1;
+    font-weight: 600;
+}
+
+.file-label:hover {
+    background-color: #3498db;
+    color: white;
+}
+
+#upload-btn {
+    flex-grow: 1;
+}
+
+
 /* --- Results Area --- */
 #generation-results-container, #history-results-container {
     margin-top: 30px;
@@ -174,6 +217,7 @@ input:focus, select:focus {
     border: 1px solid var(--card-border);
     border-radius: 12px;
     padding: 20px;
+    padding-right: 80px;
     margin-bottom: 15px;
     position: relative;
     line-height: 1.6;
@@ -182,15 +226,8 @@ input:focus, select:focus {
     transition: background-color 0.3s, border-color 0.3s;
 }
 
-#image-result-card {
-    padding: 10px;
-    text-align: center;
-}
-
-#image-result-card img {
-    max-width: 100%;
-    border-radius: 8px;
-}
+#image-result-card { padding: 10px; text-align: center; }
+#image-result-card img { max-width: 100%; border-radius: 8px; }
 
 .card-actions {
     position: absolute;
@@ -205,10 +242,10 @@ input:focus, select:focus {
     color: var(--button-secondary-text);
     border: none;
     border-radius: 6px;
-    padding: 6px 10px;
+    padding: 5px 10px;
     cursor: pointer;
     transition: background-color 0.3s, color 0.3s, transform 0.2s;
-    font-size: 18px;
+    font-size: 14px;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -237,14 +274,8 @@ input:focus, select:focus {
 }
 
 .history-controls .tabs button {
-    background: none;
-    border: none;
-    font-size: 18px;
-    padding: 5px 15px;
-    cursor: pointer;
-    color: var(--text-secondary);
-    border-bottom: 3px solid transparent;
-    transition: color 0.3s, border-color 0.3s;
+    background: none; border: none; font-size: 16px; padding: 5px 10px; cursor: pointer;
+    color: var(--text-secondary); border-bottom: 3px solid transparent; transition: color 0.3s, border-color 0.3s;
 }
 
 .history-controls .tabs button.active {
@@ -259,25 +290,50 @@ input:focus, select:focus {
     font-size: 14px;
     background-color: var(--input-bg);
     color: var(--text-primary);
-    width: 200px;
+    flex-grow: 1;
+    min-width: 150px;
 }
 
 /* --- Spinner --- */
 .spinner-container {
-    display: none;
-    min-height: 150px;
-    justify-content: center;
-    align-items: center;
+    display: none; min-height: 150px; justify-content: center; align-items: center;
 }
 .spinner {
-    border: 6px solid #f3f3f3;
-    border-top: 6px solid #3498db;
-    border-radius: 50%;
-    width: 50px;
-    height: 50px;
+    border: 6px solid #f3f3f3; border-top: 6px solid #3498db;
+    border-radius: 50%; width: 50px; height: 50px;
     animation: spin 1s linear infinite;
 }
 @keyframes spin {
     0% { transform: rotate(0deg); }
     100% { transform: rotate(360deg); }
+}
+
+/* --- Mobile Responsive Design --- */
+@media (max-width: 600px) {
+    body {
+        padding: 10px;
+    }
+
+    .container {
+        padding: 20px;
+    }
+
+    h1 {
+        font-size: 24px;
+    }
+
+    .app-tabs button {
+        font-size: 14px;
+        padding: 12px 5px;
+    }
+
+    .history-controls {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .upload-section {
+        flex-direction: column;
+        align-items: stretch;
+    }
 }
