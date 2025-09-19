@@ -13,7 +13,7 @@
 
     <div class="container">
         <div class="theme-switch" id="theme-switch" title="Toggle dark mode">🌙</div>
-        <h1>AI Social Media Assistant v2.3</h1>
+        <h1>AI Social Media Assistant v2.4</h1>
 
         <div class="app-tabs">
             <button id="tab-text" class="active">Δημιουργία Κειμένου</button>
@@ -289,7 +289,7 @@
             dayCell.dataset.day = i;
             
             const dayNumber = document.createElement('div');
-            dayNumber.style.textAlign = 'right'; dayNumber.style.fontSize = '14px';
+            dayNumber.className = 'day-number';
             dayNumber.textContent = i;
             dayCell.appendChild(dayNumber);
 
@@ -382,8 +382,11 @@
             if (data.image_url) {
                 const card = document.createElement('div');
                 card.id = 'image-result-card';
-                card.innerHTML = `<img src="${data.image_url}" alt="Uploaded Image">`;
+                card.innerHTML = `<img src="${data.image_url}" alt="Uploaded Image"><button class="analyze-btn">Ανάλυση Εικόνας με AI</button>`;
                 generationResultsContainer.appendChild(card);
+                
+                // Add event listener to the newly created button
+                card.querySelector('.analyze-btn').onclick = () => analyzeImageWithAI(data.image_url);
             } else {
                 generationResultsContainer.innerHTML = `<div class="result-card">${data.error || 'Error'}</div>`;
             }
@@ -393,6 +396,30 @@
             generationResultsContainer.innerHTML = '<div class="result-card">Network error.</div>';
         });
     });
+
+    function analyzeImageWithAI(imageUrl) {
+        spinnerContainer.style.display = 'flex';
+        fetch('/analyze-image', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ image_url: imageUrl })
+        })
+        .then(response => response.json())
+        .then(data => {
+            spinnerContainer.style.display = 'none';
+            if (data.description) {
+                document.getElementById('topic-input').value = data.description;
+                textTab.click();
+                alert('Η ανάλυση της εικόνας ολοκληρώθηκε! Η περιγραφή προστέθηκε στο "Κύριο Θέμα".');
+            } else {
+                alert(data.error || 'Η ανάλυση απέτυχε.');
+            }
+        })
+        .catch(error => {
+            spinnerContainer.style.display = 'none';
+            alert('Παρουσιάστηκε σφάλμα δικτύου κατά την ανάλυση.');
+        });
+    }
 
     saveSettingsBtn.addEventListener('click', () => {
         const brandVoice = brandVoiceInput.value;

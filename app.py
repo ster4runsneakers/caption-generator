@@ -5,10 +5,10 @@ from openai import OpenAI
 from dotenv import load_dotenv
 import cloudinary
 import cloudinary.uploader
+import requests
 
-# --- Initial Setup ---
 load_dotenv()
-app = Flask(__name__) # <--- Η ΔΗΜΙΟΥΡΓΙΑ ΤΟΥ APP ΓΙΝΕΤΑΙ ΕΔΩ, ΣΤΗΝ ΑΡΧΗ
+app = Flask(__name__)
 
 # --- Configure Cloudinary ---
 cloudinary.config(
@@ -29,11 +29,47 @@ try:
 except Exception as e:
     gemini_model = None
 
-# --- ## ROUTES (ΤΩΡΑ ΜΠΟΡΟΥΜΕ ΝΑ ΧΡΗΣΙΜΟΠΟΙΗΣΟΥΜΕ ΤΟ @app.route) ## ---
+
 @app.route('/')
 def index():
     return render_template('index.html')
 
+# --- Endpoint for Image Analysis (Vision) ---
+@app.route('/analyze-image', methods=['POST'])
+def analyze_image():
+    if not gemini_model:
+        return jsonify({"error": "Gemini client not initialized."}), 500
+    
+    data = request.get_json()
+    image_url = data.get('image_url')
+    if not image_url:
+        return jsonify({"error": "Image URL is required"}), 400
+
+    try:
+        image_response = requests.get(image_url, stream=True)
+        image_response.raise_for_status()
+        
+        image_parts = [{
+            "mime_type": image_response.headers['Content-Type'],
+            "data": image_response.content
+        }]
+
+        prompt_parts = [
+            image_parts[0],
+            "\nDescribe this image in detail for a social media post. Be descriptive and engaging. The description should be in Greek.",
+        ]
+
+        response = gemini_model.generate_content(prompt_parts)
+        
+        return jsonify({"description": response.text})
+
+    except requests.exceptions.RequestException as e:
+        return jsonify({"error": f"Failed to download image: {e}"}), 500
+    except Exception as e:
+        print(f"Error analyzing image with Gemini: {e}")
+        return jsonify({"error": "Failed to analyze image."}), 500
+
+# --- Endpoint for User Image Upload ---
 @app.route('/upload-image', methods=['POST'])
 def upload_image():
     if 'file' not in request.files:
@@ -51,6 +87,7 @@ def upload_image():
         except Exception as e:
             return jsonify({"error": str(e)}), 500
 
+# --- Endpoint for Text Generation ---
 @app.route('/generate-caption', methods=['POST'])
 def generate_caption():
     data = request.get_json()
@@ -106,6 +143,7 @@ def generate_caption():
         print(f"Error during AI generation with {model_choice}: {e}")
         return jsonify({"error": f"An error occurred with the {model_choice} API. Please try again."}), 500
 
+# --- Endpoint for AI Image Generation ---
 @app.route('/generate-image', methods=['POST'])
 def generate_image():
     if not openai_client:
@@ -134,6 +172,5 @@ def generate_image():
         print(f"Error generating image with DALL-E: {e}")
         return jsonify({"error": "Failed to generate image. The prompt may have been rejected."}), 500
 
-# --- Start the App ---
 if __name__ == '__main__':
     app.run(debug=True)

@@ -71,7 +71,7 @@ h1 {
     font-size: 28px;
 }
 
-h3, h4 {
+h3 {
     color: var(--text-primary);
     font-size: 18px;
     margin-top: 0;
@@ -189,7 +189,7 @@ input:focus, select:focus, textarea:focus {
 }
 
 input[type="file"] {
-    display: none;
+    display: none; /* Hide the default input */
 }
 
 .file-label {
@@ -208,6 +208,7 @@ input[type="file"] {
     background-color: #3498db;
     color: white;
 }
+
 
 /* --- Results Area --- */
 #generation-results-container, #history-results-container {
@@ -312,16 +313,15 @@ input[type="file"] {
     flex-grow: 1;
     min-width: 150px;
 }
-
-/* --- ## STYLES FOR CONTENT CALENDAR (CORRECTED) ## --- */
+/* --- Calendar Styles --- */
 #calendar-container {
     display: flex;
     gap: 20px;
-    flex-wrap: wrap; /* Changed to wrap for responsiveness */
+    flex-wrap: wrap;
 }
 
 #calendar-sidebar {
-    flex: 1 1 220px; /* Sidebar width */
+    flex: 1 1 220px;
     background-color: var(--input-bg);
     border-radius: 12px;
     padding: 15px;
@@ -350,7 +350,7 @@ input[type="file"] {
 }
 
 #calendar-main {
-    flex: 3 1 400px; /* Main calendar area */
+    flex: 3 1 400px;
 }
 
 .calendar-grid {
@@ -374,13 +374,13 @@ input[type="file"] {
     padding: 5px;
     transition: background-color 0.3s;
     display: flex;
-    flex-direction: column; /* Stack day number and items */
+    flex-direction: column;
 }
 
 .day-number {
     font-size: 14px;
     font-weight: 600;
-    align-self: flex-end; /* Pushes number to the right */
+    align-self: flex-end;
     margin-bottom: 4px;
 }
 
@@ -449,5 +449,9 @@ input[type="file"] {
     }
     .scheduled-item {
         font-size: 10px;
+    }
+    .upload-section {
+        flex-direction: column;
+        align-items: stretch;
     }
 }
