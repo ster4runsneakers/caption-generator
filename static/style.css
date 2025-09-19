@@ -71,7 +71,7 @@ h1 {
     font-size: 28px;
 }
 
-h3 {
+h3, h4 {
     color: var(--text-primary);
     font-size: 18px;
     margin-top: 0;
@@ -124,28 +124,7 @@ p {
 }
 
 .form-controls input[type="text"],
-.form-controls select {
-    width: 100%;
-    padding: 12px 15px;
-    border: 1px solid var(--border-color);
-    border-radius: 8px;
-    font-size: 16px;
-    box-sizing: border-box;
-    background-color: var(--input-bg);
-    color: var(--text-primary);
-    transition: border-color 0.3s, box-shadow 0.3s, background-color 0.3s, color 0.3s;
-}
-
-.form-controls input[type="text"] { flex: 2 1 250px; }
-.form-controls select { flex: 1 1 150px; }
-
-input:focus, select:focus {
-    outline: none;
-    border-color: #3498db;
-    box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.2);
-}
-
-/* --- Textarea for Settings --- */
+.form-controls select,
 textarea {
     width: 100%;
     padding: 12px 15px;
@@ -156,9 +135,21 @@ textarea {
     background-color: var(--input-bg);
     color: var(--text-primary);
     font-family: 'Poppins', sans-serif;
+    transition: border-color 0.3s, box-shadow 0.3s, background-color 0.3s, color 0.3s;
+}
+
+textarea {
     resize: vertical;
     min-height: 120px;
-    margin-bottom: 20px;
+}
+
+.form-controls input[type="text"] { flex: 2 1 250px; }
+.form-controls select { flex: 1 1 150px; }
+
+input:focus, select:focus, textarea:focus {
+    outline: none;
+    border-color: #3498db;
+    box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.2);
 }
 
 /* --- Generate & Upload Buttons --- */
@@ -322,49 +313,15 @@ input[type="file"] {
     min-width: 150px;
 }
 
-/* --- Spinner --- */
-.spinner-container {
-    display: none; min-height: 150px; justify-content: center; align-items: center;
-}
-.spinner {
-    border: 6px solid #f3f3f3; border-top: 6px solid #3498db;
-    border-radius: 50%; width: 50px; height: 50px;
-    animation: spin 1s linear infinite;
-}
-@keyframes spin {
-    0% { transform: rotate(0deg); }
-    100% { transform: rotate(360deg); }
-}
-
-/* --- Mobile Responsive Design --- */
-@media (max-width: 600px) {
-    body {
-        padding: 10px;
-    }
-    .container {
-        padding: 20px;
-    }
-    h1 {
-        font-size: 24px;
-    }
-    .app-tabs button {
-        font-size: 14px;
-        padding: 12px 5px;
-    }
-    .history-controls {
-        flex-direction: column;
-        align-items: stretch;
-    }
-}
-/* --- ## NEW STYLES FOR v2.3 CONTENT CALENDAR ## --- */
+/* --- ## STYLES FOR CONTENT CALENDAR (CORRECTED) ## --- */
 #calendar-container {
     display: flex;
     gap: 20px;
-    flex-wrap: wrap;
+    flex-wrap: wrap; /* Changed to wrap for responsiveness */
 }
 
 #calendar-sidebar {
-    flex: 1 1 200px; /* Sidebar width */
+    flex: 1 1 220px; /* Sidebar width */
     background-color: var(--input-bg);
     border-radius: 12px;
     padding: 15px;
@@ -374,7 +331,7 @@ input[type="file"] {
 
 #calendar-sidebar h4 {
     margin-top: 0;
-    color: var(--text-primary);
+    text-align: center;
     border-bottom: 2px solid var(--border-color);
     padding-bottom: 10px;
 }
@@ -402,20 +359,29 @@ input[type="file"] {
     gap: 5px;
 }
 
-.calendar-day {
-    border: 1px solid var(--border-color);
-    border-radius: 8px;
-    min-height: 100px;
-    padding: 5px;
-    transition: background-color 0.3s;
-}
-
 .calendar-day-header {
     font-size: 12px;
     font-weight: 600;
     text-align: center;
     color: var(--text-secondary);
     padding-bottom: 5px;
+}
+
+.calendar-day {
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    min-height: 100px;
+    padding: 5px;
+    transition: background-color 0.3s;
+    display: flex;
+    flex-direction: column; /* Stack day number and items */
+}
+
+.day-number {
+    font-size: 14px;
+    font-weight: 600;
+    align-self: flex-end; /* Pushes number to the right */
+    margin-bottom: 4px;
 }
 
 .calendar-day.drag-over {
@@ -433,4 +399,55 @@ input[type="file"] {
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
+    cursor: default;
+}
+
+
+/* --- Spinner --- */
+.spinner-container {
+    display: none; min-height: 150px; justify-content: center; align-items: center;
+}
+.spinner {
+    border: 6px solid #f3f3f3; border-top: 6px solid #3498db;
+    border-radius: 50%; width: 50px; height: 50px;
+    animation: spin 1s linear infinite;
+}
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+/* --- Mobile Responsive Design --- */
+@media (max-width: 600px) {
+    body {
+        padding: 10px;
+    }
+    .container {
+        padding: 20px;
+    }
+    h1 {
+        font-size: 24px;
+    }
+    .app-tabs button {
+        font-size: 12px;
+        padding: 12px 2px;
+    }
+    .history-controls {
+        flex-direction: column;
+        align-items: stretch;
+    }
+    #calendar-container {
+        flex-direction: column;
+    }
+    #calendar-sidebar {
+        height: auto;
+        max-height: 250px;
+    }
+    .calendar-day {
+        min-height: 80px;
+        padding: 3px;
+    }
+    .scheduled-item {
+        font-size: 10px;
+    }
 }
