@@ -6,8 +6,9 @@ from dotenv import load_dotenv
 import cloudinary
 import cloudinary.uploader
 
+# --- Initial Setup ---
 load_dotenv()
-app = Flask(__name__)
+app = Flask(__name__) # <--- Η ΔΗΜΙΟΥΡΓΙΑ ΤΟΥ APP ΓΙΝΕΤΑΙ ΕΔΩ, ΣΤΗΝ ΑΡΧΗ
 
 # --- Configure Cloudinary ---
 cloudinary.config(
@@ -28,12 +29,11 @@ try:
 except Exception as e:
     gemini_model = None
 
-
+# --- ## ROUTES (ΤΩΡΑ ΜΠΟΡΟΥΜΕ ΝΑ ΧΡΗΣΙΜΟΠΟΙΗΣΟΥΜΕ ΤΟ @app.route) ## ---
 @app.route('/')
 def index():
     return render_template('index.html')
 
-# --- ## Endpoint for Image Upload ## ---
 @app.route('/upload-image', methods=['POST'])
 def upload_image():
     if 'file' not in request.files:
@@ -51,7 +51,6 @@ def upload_image():
         except Exception as e:
             return jsonify({"error": str(e)}), 500
 
-# --- Endpoint for Text Generation ---
 @app.route('/generate-caption', methods=['POST'])
 def generate_caption():
     data = request.get_json()
@@ -65,6 +64,7 @@ def generate_caption():
     language = data.get('language')
     keywords = data.get('keywords')
     model_choice = data.get('model_choice', 'openai')
+    brand_voice = data.get('brand_voice', '')
 
     content_map = {
         'Caption': 'a full caption (including a hook, body, and CTA)',
@@ -74,7 +74,11 @@ def generate_caption():
     }
     requested_content = content_map.get(content_type, 'a full caption')
     
-    prompt = f"""
+    prompt = ""
+    if brand_voice:
+        prompt += f"SPECIAL INSTRUCTION: Adhere strictly to the following brand voice: '{brand_voice}'.\n\n"
+    
+    prompt += f"""
     Generate 3 distinct options for {requested_content} for a {platform} post.
     The main topic is: '{topic}'.
     The desired tone is: {tone}.
@@ -102,7 +106,6 @@ def generate_caption():
         print(f"Error during AI generation with {model_choice}: {e}")
         return jsonify({"error": f"An error occurred with the {model_choice} API. Please try again."}), 500
 
-# --- Endpoint for AI Image Generation ---
 @app.route('/generate-image', methods=['POST'])
 def generate_image():
     if not openai_client:
@@ -131,6 +134,6 @@ def generate_image():
         print(f"Error generating image with DALL-E: {e}")
         return jsonify({"error": "Failed to generate image. The prompt may have been rejected."}), 500
 
-
+# --- Start the App ---
 if __name__ == '__main__':
     app.run(debug=True)

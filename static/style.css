@@ -113,6 +113,7 @@ p {
 /* --- View Containers --- */
 .view-container { display: none; }
 .view-container.active { display: block; }
+.view-content { padding-top: 20px; }
 
 /* --- Form Controls Layout --- */
 .form-controls {
@@ -144,8 +145,24 @@ input:focus, select:focus {
     box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.2);
 }
 
+/* --- Textarea for Settings --- */
+textarea {
+    width: 100%;
+    padding: 12px 15px;
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    font-size: 16px;
+    box-sizing: border-box;
+    background-color: var(--input-bg);
+    color: var(--text-primary);
+    font-family: 'Poppins', sans-serif;
+    resize: vertical;
+    min-height: 120px;
+    margin-bottom: 20px;
+}
+
 /* --- Generate & Upload Buttons --- */
-.view-container button {
+#generate-text-btn, #generate-image-btn, #upload-btn, #save-settings-btn {
     background: linear-gradient(45deg, #3498db, #2980b9);
     color: white;
     border: none;
@@ -158,7 +175,7 @@ input:focus, select:focus {
     width: 100%;
 }
 
-.view-container button:hover {
+#generate-text-btn:hover, #generate-image-btn:hover, #upload-btn:hover, #save-settings-btn:hover {
     transform: translateY(-2px);
     box-shadow: 0 6px 20px rgba(52, 152, 219, 0.3);
 }
@@ -181,7 +198,7 @@ input:focus, select:focus {
 }
 
 input[type="file"] {
-    display: none; /* Hide the default input */
+    display: none;
 }
 
 .file-label {
@@ -201,11 +218,6 @@ input[type="file"] {
     color: white;
 }
 
-#upload-btn {
-    flex-grow: 1;
-}
-
-
 /* --- Results Area --- */
 #generation-results-container, #history-results-container {
     margin-top: 30px;
@@ -216,14 +228,15 @@ input[type="file"] {
     background-color: var(--card-bg);
     border: 1px solid var(--card-border);
     border-radius: 12px;
-    padding: 20px;
-    padding-right: 80px;
+    padding: 20px 85px 20px 20px;
     margin-bottom: 15px;
     position: relative;
     line-height: 1.6;
     white-space: pre-wrap;
     font-size: 15px;
     transition: background-color 0.3s, border-color 0.3s;
+    display: flex;
+    align-items: center;
 }
 
 #image-result-card { padding: 10px; text-align: center; }
@@ -231,7 +244,8 @@ input[type="file"] {
 
 .card-actions {
     position: absolute;
-    top: 15px;
+    top: 50%;
+    transform: translateY(-50%);
     right: 15px;
     display: flex;
     gap: 8px;
@@ -242,14 +256,15 @@ input[type="file"] {
     color: var(--button-secondary-text);
     border: none;
     border-radius: 6px;
-    padding: 4px 8px;      /* ## Η ΝΕΑ, ΜΙΚΡΟΤΕΡΗ ΤΙΜΗ ## */
+    padding: 6px 12px;
     cursor: pointer;
     transition: background-color 0.3s, color 0.3s, transform 0.2s;
-    font-size: 12px;        /* ## Η ΝΕΑ, ΜΙΚΡΟΤΕΡΗ ΤΙΜΗ ## */
+    font-size: 14px;
     display: flex;
     align-items: center;
     justify-content: center;
 }
+
 .copy-btn:hover, .fav-btn:hover {
     background-color: #3498db;
     color: white;
@@ -270,16 +285,30 @@ input[type="file"] {
     gap: 15px;
     border-bottom: 2px solid var(--border-color);
     padding-bottom: 10px;
+    margin-bottom: 20px;
+}
+
+.history-controls .tabs {
+    display: flex;
+    gap: 10px;
 }
 
 .history-controls .tabs button {
-    background: none; border: none; font-size: 16px; padding: 5px 10px; cursor: pointer;
-    color: var(--text-secondary); border-bottom: 3px solid transparent; transition: color 0.3s, border-color 0.3s;
+    background: var(--button-secondary-bg);
+    border: 1px solid var(--border-color);
+    font-size: 14px;
+    padding: 8px 16px;
+    cursor: pointer;
+    color: var(--text-secondary);
+    border-radius: 8px;
+    transition: color 0.3s, background-color 0.3s, border-color 0.3s;
+    font-weight: 600;
 }
 
 .history-controls .tabs button.active {
-    color: var(--text-primary);
-    border-bottom: 3px solid #3498db;
+    color: white;
+    background: linear-gradient(45deg, #3498db, #2980b9);
+    border-color: transparent;
 }
 
 #search-history {
@@ -312,26 +341,17 @@ input[type="file"] {
     body {
         padding: 10px;
     }
-
     .container {
         padding: 20px;
     }
-
     h1 {
         font-size: 24px;
     }
-
     .app-tabs button {
         font-size: 14px;
         padding: 12px 5px;
     }
-
     .history-controls {
-        flex-direction: column;
-        align-items: stretch;
-    }
-
-    .upload-section {
         flex-direction: column;
         align-items: stretch;
     }

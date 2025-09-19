@@ -21,7 +21,8 @@
             <button id="tab-history">Ιστορικό & Αγαπημένα</button>
         </div>
         
-        <div class="view-content"> <div id="view-text" class="view-container active">
+        <div class="view-content">
+            <div id="view-text" class="view-container active">
                 <p>Δημιούργησε Hooks, CTAs και Captions για τα social media σου.</p>
                 <div class="form-controls">
                     <input type="text" id="topic-input" placeholder="Κύριο θέμα...">
@@ -43,7 +44,7 @@
                         <option value="Friendly">Φιλικό</option>
                         <option value="Professional">Επαγγελματικό</option>
                         <option value="Funny">Αστείο</option>
-                        <option value="Enthusiώδες">Ενθουσιώδες</option>
+                        <option value="Enthusiastic">Ενθουσιώδες</option>
                     </select>
                     <select id="language-select">
                         <option value="Greek">Ελληνικά</option>
@@ -58,12 +59,11 @@
             </div>
 
             <div id="view-image" class="view-container">
-                <p>Δημιούργησε μια εικόνα με AI ή ανέβασε μια δική σου.</p>
-                
-                <div class="form-section ai-generation-section">
+                <div class="form-section">
                     <h3>Δημιουργία με AI</h3>
+                    <p>Περιέγραψε την εικόνα που θέλεις να δημιουργήσει το AI.</p>
                     <div class="form-controls">
-                        <input type="text" id="image-prompt-input" placeholder="Περιγραφή εικόνας για το AI...">
+                        <input type="text" id="image-prompt-input" placeholder="π.χ., Ένας αστροναύτης σε μια παραλία, ρεαλιστικό στυλ...">
                         <select id="image-style-select">
                             <option value="photorealistic">Φωτορεαλιστικό</option>
                             <option value="digital art">Digital Art</option>
@@ -75,11 +75,13 @@
                     <button id="generate-image-btn">Δημιουργία Εικόνας με AI</button>
                 </div>
 
-                <div class="form-section upload-section">
+                <div class="form-section">
                     <h3>Ανέβασμα Δικής σου Εικόνας</h3>
-                    <input type="file" id="file-input" accept="image/png, image/jpeg">
-                    <label for="file-input" class="file-label">Επίλεξε Φωτογραφία</label>
-                    <button id="upload-btn">Ανέβασμα Φωτογραφίας</button>
+                    <div class="upload-section">
+                        <input type="file" id="file-input" accept="image/png, image/jpeg">
+                        <label for="file-input" class="file-label">Επίλεξε Φωτογραφία</label>
+                        <button id="upload-btn">Ανέβασμα Φωτογραφίας</button>
+                    </div>
                 </div>
             </div>
 
@@ -93,7 +95,9 @@
                 </div>
                 <div id="history-results-container"></div>
             </div>
-        </div> <div id="spinner-container" class="spinner-container"><div class="spinner"></div></div>
+        </div> 
+
+        <div id="spinner-container" class="spinner-container"><div class="spinner"></div></div>
         <div id="generation-results-container"></div>
     </div>
 
@@ -114,8 +118,6 @@
     const searchInput = document.getElementById('search-history');
     const historySubTab = document.getElementById('subtab-history');
     const favoritesSubTab = document.getElementById('subtab-favorites');
-
-    // NEW UPLOAD ELEMENTS
     const uploadBtn = document.getElementById('upload-btn');
     const fileInput = document.getElementById('file-input');
 
@@ -247,19 +249,15 @@
         performFetch('/generate-image', payload, true);
     });
 
-    // --- UPLOAD LOGIC ---
     uploadBtn.addEventListener('click', () => {
         const file = fileInput.files[0];
         if (!file) {
             return alert('Παρακαλώ, επίλεξε πρώτα ένα αρχείο!');
         }
-
         spinnerContainer.style.display = 'flex';
         generationResultsContainer.innerHTML = '';
-        
         const formData = new FormData();
         formData.append('file', file);
-
         fetch('/upload-image', {
             method: 'POST',
             body: formData
