@@ -356,3 +356,81 @@ input[type="file"] {
         align-items: stretch;
     }
 }
+/* --- ## NEW STYLES FOR v2.3 CONTENT CALENDAR ## --- */
+#calendar-container {
+    display: flex;
+    gap: 20px;
+    flex-wrap: wrap;
+}
+
+#calendar-sidebar {
+    flex: 1 1 200px; /* Sidebar width */
+    background-color: var(--input-bg);
+    border-radius: 12px;
+    padding: 15px;
+    height: 500px;
+    overflow-y: auto;
+}
+
+#calendar-sidebar h4 {
+    margin-top: 0;
+    color: var(--text-primary);
+    border-bottom: 2px solid var(--border-color);
+    padding-bottom: 10px;
+}
+
+.favorite-item {
+    background-color: var(--card-bg);
+    border: 1px solid var(--card-border);
+    border-radius: 8px;
+    padding: 10px;
+    margin-bottom: 10px;
+    cursor: grab;
+    font-size: 14px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+#calendar-main {
+    flex: 3 1 400px; /* Main calendar area */
+}
+
+.calendar-grid {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 5px;
+}
+
+.calendar-day {
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    min-height: 100px;
+    padding: 5px;
+    transition: background-color 0.3s;
+}
+
+.calendar-day-header {
+    font-size: 12px;
+    font-weight: 600;
+    text-align: center;
+    color: var(--text-secondary);
+    padding-bottom: 5px;
+}
+
+.calendar-day.drag-over {
+    background-color: rgba(52, 152, 219, 0.2);
+    border-style: dashed;
+}
+
+.scheduled-item {
+    background-color: #3498db;
+    color: white;
+    font-size: 12px;
+    padding: 3px 6px;
+    border-radius: 4px;
+    margin-top: 5px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
