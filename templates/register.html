@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="el">
+<head>
+    <meta charset="UTF-8">
+    <title>Register</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <div class="container">
+        <h1>Εγγραφή</h1>
+        <form method="post" class="auth-form">
+            <input type="text" name="username" placeholder="Όνομα Χρήστη" required>
+            <input type="password" name="password" placeholder="Κωδικός" required>
+            <button type="submit">Εγγραφή</button>
+        </form>
+        <p class="auth-switch">Έχεις ήδη λογαριασμό; <a href="{{ url_for('login') }}">Κάνε σύνδεση</a></p>
+
+        {% with messages = get_flashed_messages() %}
+          {% if messages %}
+            <ul class="flashes">
+            {% for message in messages %}
+              <li>{{ message }}</li>
+            {% endfor %}
+            </ul>
+          {% endif %}
+        {% endwith %}
+    </div>
+</body>
+</html>
