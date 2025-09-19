@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AI Social Media Assistant v2.1</title>
+    <title>AI Social Media Assistant v2.3</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
@@ -13,12 +13,14 @@
 
     <div class="container">
         <div class="theme-switch" id="theme-switch" title="Toggle dark mode">🌙</div>
-        <h1>AI Social Media Assistant v2.1</h1>
+        <h1>AI Social Media Assistant v2.3</h1>
 
         <div class="app-tabs">
             <button id="tab-text" class="active">Δημιουργία Κειμένου</button>
             <button id="tab-image">Δημιουργία Εικόνας</button>
-            <button id="tab-history">Ιστορικό & Αγαπημένα</button>
+            <button id="tab-calendar">Ημερολόγιο</button>
+            <button id="tab-history">Ιστορικό</button>
+            <button id="tab-settings">Ρυθμίσεις</button>
         </div>
         
         <div class="view-content">
@@ -59,7 +61,7 @@
             </div>
 
             <div id="view-image" class="view-container">
-                <div class="form-section">
+                 <div class="form-section">
                     <h3>Δημιουργία με AI</h3>
                     <p>Περιέγραψε την εικόνα που θέλεις να δημιουργήσει το AI.</p>
                     <div class="form-controls">
@@ -74,13 +76,25 @@
                     </div>
                     <button id="generate-image-btn">Δημιουργία Εικόνας με AI</button>
                 </div>
-
                 <div class="form-section">
                     <h3>Ανέβασμα Δικής σου Εικόνας</h3>
                     <div class="upload-section">
                         <input type="file" id="file-input" accept="image/png, image/jpeg">
                         <label for="file-input" class="file-label">Επίλεξε Φωτογραφία</label>
                         <button id="upload-btn">Ανέβασμα Φωτογραφίας</button>
+                    </div>
+                </div>
+            </div>
+            
+            <div id="view-calendar" class="view-container">
+                <p>Οργάνωσε τα αγαπημένα σου posts. Κάνε drag & drop ένα caption από τη λίστα σε μια μέρα του ημερολογίου.</p>
+                <div id="calendar-container">
+                    <div id="calendar-sidebar">
+                        <h4>⭐ Αγαπημένα</h4>
+                        <div id="favorites-list"></div>
+                    </div>
+                    <div id="calendar-main">
+                        <div class="calendar-grid" id="calendar-grid"></div>
                     </div>
                 </div>
             </div>
@@ -95,6 +109,13 @@
                 </div>
                 <div id="history-results-container"></div>
             </div>
+            
+            <div id="view-settings" class="view-container">
+                <h3>Η Φωνή του Brand σου (Brand Voice)</h3>
+                <p>Περιέγραψε το ύφος και την προσωπικότητα του brand σου. Το AI θα ακολουθεί πάντα αυτές τις οδηγίες.</p>
+                <textarea id="brand-voice-input" rows="6" placeholder="π.χ., Είμαστε ένα παιχνιδιάρικο brand. Χρησιμοποιούμε απλή γλώσσα, πολλά emojis και πάντα χιούμορ..."></textarea>
+                <button id="save-settings-btn">Αποθήκευση Ρυθμίσεων</button>
+            </div>
         </div> 
 
         <div id="spinner-container" class="spinner-container"><div class="spinner"></div></div>
@@ -102,15 +123,24 @@
     </div>
 
     <script>
-    // --- DOM Elements ---
+    // --- ΒΗΜΑ 1: ΟΡΙΣΜΟΣ ΟΛΩΝ ΤΩΝ ΜΕΤΑΒΛΗΤΩΝ ΣΤΗΝ ΑΡΧΗ ---
     const textTab = document.getElementById('tab-text');
     const imageTab = document.getElementById('tab-image');
+    const calendarTab = document.getElementById('tab-calendar');
     const historyTab = document.getElementById('tab-history');
+    const settingsTab = document.getElementById('tab-settings');
+    
     const textView = document.getElementById('view-text');
     const imageView = document.getElementById('view-image');
+    const calendarView = document.getElementById('view-calendar');
     const historyView = document.getElementById('view-history');
+    const settingsView = document.getElementById('view-settings');
+    
     const generateTextBtn = document.getElementById('generate-text-btn');
     const generateImageBtn = document.getElementById('generate-image-btn');
+    const uploadBtn = document.getElementById('upload-btn');
+    const saveSettingsBtn = document.getElementById('save-settings-btn');
+
     const generationResultsContainer = document.getElementById('generation-results-container');
     const historyResultsContainer = document.getElementById('history-results-container');
     const spinnerContainer = document.getElementById('spinner-container');
@@ -118,12 +148,14 @@
     const searchInput = document.getElementById('search-history');
     const historySubTab = document.getElementById('subtab-history');
     const favoritesSubTab = document.getElementById('subtab-favorites');
-    const uploadBtn = document.getElementById('upload-btn');
     const fileInput = document.getElementById('file-input');
+    const brandVoiceInput = document.getElementById('brand-voice-input');
+    const favoritesList = document.getElementById('favorites-list');
+    const calendarGrid = document.getElementById('calendar-grid');
 
     let currentHistoryView = 'history';
 
-    // --- Core Functions (getStorage, setStorage, createResultCard, etc.) ---
+    // --- ΒΗΜΑ 2: ΟΡΙΣΜΟΣ ΟΛΩΝ ΤΩΝ ΣΥΝΑΡΤΗΣΕΩΝ ---
     const getStorage = (key) => JSON.parse(localStorage.getItem(key)) || [];
     const setStorage = (key, value) => localStorage.setItem(key, JSON.stringify(value));
 
@@ -169,23 +201,17 @@
         setStorage('favorites', favorites);
         renderHistory(searchInput.value);
     }
-
-    // --- Tab Switching Logic ---
+    
     function switchTab(activeTab, activeView) {
-        [textTab, imageTab, historyTab].forEach(tab => tab.classList.remove('active'));
-        [textView, imageView, historyView].forEach(view => view.classList.remove('active'));
+        [textTab, imageTab, calendarTab, historyTab, settingsTab].forEach(tab => tab.classList.remove('active'));
+        [textView, imageView, calendarView, historyView, settingsView].forEach(view => view.classList.remove('active'));
         activeTab.classList.add('active');
         activeView.classList.add('active');
         generationResultsContainer.innerHTML = '';
         if (activeTab === historyTab) renderHistory(searchInput.value);
+        if (activeTab === calendarTab) loadCalendarFeatures();
     }
-    textTab.addEventListener('click', () => switchTab(textTab, textView));
-    imageTab.addEventListener('click', () => switchTab(imageTab, imageView));
-    historyTab.addEventListener('click', () => switchTab(historyTab, historyView));
-    historySubTab.addEventListener('click', () => { currentHistoryView = 'history'; historySubTab.classList.add('active'); favoritesSubTab.classList.remove('active'); renderHistory(searchInput.value); });
-    favoritesSubTab.addEventListener('click', () => { currentHistoryView = 'favorites'; favoritesSubTab.classList.add('active'); historySubTab.classList.remove('active'); renderHistory(searchInput.value); });
-
-    // --- API Call Logic ---
+    
     function performFetch(endpoint, payload, isImage = false) {
         spinnerContainer.style.display = 'flex';
         generationResultsContainer.innerHTML = '';
@@ -222,11 +248,103 @@
             generationResultsContainer.innerHTML = '<div class="result-card">Network error.</div>';
         });
     }
+    
+    function loadCalendarFeatures() {
+        populateFavoritesSidebar();
+        renderCalendar();
+    }
 
-    // --- Event Listeners for Buttons ---
+    function populateFavoritesSidebar() {
+        favoritesList.innerHTML = '';
+        const favorites = getStorage('favorites');
+        if (favorites.length === 0) {
+            favoritesList.innerHTML = '<p style="font-size: 13px; color: var(--text-secondary);">Δεν υπάρχουν αγαπημένα.</p>';
+            return;
+        }
+        favorites.forEach(text => {
+            const item = document.createElement('div');
+            item.className = 'favorite-item';
+            item.textContent = text;
+            item.draggable = true;
+            item.addEventListener('dragstart', (e) => {
+                e.dataTransfer.setData('text/plain', text);
+            });
+            favoritesList.appendChild(item);
+        });
+    }
+
+    function renderCalendar() {
+        calendarGrid.innerHTML = '';
+        const daysOfWeek = ['ΔΕ', 'ΤΡ', 'ΤΕ', 'ΠΕ', 'ΠΑ', 'ΣΑ', 'ΚΥ'];
+        daysOfWeek.forEach(day => {
+            const dayHeader = document.createElement('div');
+            dayHeader.className = 'calendar-day-header';
+            dayHeader.textContent = day;
+            calendarGrid.appendChild(dayHeader);
+        });
+
+        for (let i = 1; i <= 31; i++) {
+            const dayCell = document.createElement('div');
+            dayCell.className = 'calendar-day';
+            dayCell.dataset.day = i;
+            
+            const dayNumber = document.createElement('div');
+            dayNumber.style.textAlign = 'right'; dayNumber.style.fontSize = '14px';
+            dayNumber.textContent = i;
+            dayCell.appendChild(dayNumber);
+
+            dayCell.addEventListener('dragover', (e) => { e.preventDefault(); dayCell.classList.add('drag-over'); });
+            dayCell.addEventListener('dragleave', () => { dayCell.classList.remove('drag-over'); });
+            dayCell.addEventListener('drop', (e) => {
+                e.preventDefault();
+                dayCell.classList.remove('drag-over');
+                const captionText = e.dataTransfer.getData('text/plain');
+                scheduleItem(i, captionText);
+            });
+            calendarGrid.appendChild(dayCell);
+        }
+        loadScheduledItems();
+    }
+
+    function scheduleItem(day, text) {
+        let schedule = getStorage('schedule') || {};
+        if (!schedule[day]) schedule[day] = [];
+        if (schedule[day].includes(text)) return;
+        schedule[day].push(text);
+        setStorage('schedule', schedule);
+        loadScheduledItems();
+    }
+    
+    function loadScheduledItems() {
+        const schedule = getStorage('schedule') || {};
+        document.querySelectorAll('.scheduled-item').forEach(item => item.remove());
+        for (const day in schedule) {
+            const dayCell = document.querySelector(`.calendar-day[data-day='${day}']`);
+            if (dayCell) {
+                schedule[day].forEach(text => {
+                    const scheduledItem = document.createElement('div');
+                    scheduledItem.className = 'scheduled-item';
+                    scheduledItem.textContent = text;
+                    dayCell.appendChild(scheduledItem);
+                });
+            }
+        }
+    }
+
+    // --- ΒΗΜΑ 3: ΟΛΟΙ ΟΙ EVENT LISTENERS ΣΤΟ ΤΕΛΟΣ ---
+    textTab.addEventListener('click', () => switchTab(textTab, textView));
+    imageTab.addEventListener('click', () => switchTab(imageTab, imageView));
+    calendarTab.addEventListener('click', () => switchTab(calendarTab, calendarView));
+    historyTab.addEventListener('click', () => switchTab(historyTab, historyView));
+    settingsTab.addEventListener('click', () => switchTab(settingsTab, settingsView));
+
+    historySubTab.addEventListener('click', () => { currentHistoryView = 'history'; historySubTab.classList.add('active'); favoritesSubTab.classList.remove('active'); renderHistory(searchInput.value); });
+    favoritesSubTab.addEventListener('click', () => { currentHistoryView = 'favorites'; favoritesSubTab.classList.add('active'); historySubTab.classList.remove('active'); renderHistory(searchInput.value); });
+
     generateTextBtn.addEventListener('click', () => {
         const topic = document.getElementById('topic-input').value;
         if (!topic) return alert('Παρακαλώ, γράψε ένα θέμα!');
+        const brandVoice = localStorage.getItem('brandVoice') || '';
         const payload = {
             topic: topic,
             keywords: document.getElementById('keywords').value,
@@ -234,7 +352,8 @@
             contentType: document.getElementById('content-type-select').value,
             tone: document.getElementById('tone-select').value,
             language: document.getElementById('language-select').value,
-            model_choice: document.getElementById('model-select').value
+            model_choice: document.getElementById('model-select').value,
+            brand_voice: brandVoice
         };
         performFetch('/generate-caption', payload, false);
     });
@@ -251,17 +370,12 @@
 
     uploadBtn.addEventListener('click', () => {
         const file = fileInput.files[0];
-        if (!file) {
-            return alert('Παρακαλώ, επίλεξε πρώτα ένα αρχείο!');
-        }
-        spinnerContainer.style.display = 'flex';
-        generationResultsContainer.innerHTML = '';
+        if (!file) return alert('Παρακαλώ, επίλεξε πρώτα ένα αρχείο!');
         const formData = new FormData();
         formData.append('file', file);
-        fetch('/upload-image', {
-            method: 'POST',
-            body: formData
-        })
+        spinnerContainer.style.display = 'flex';
+        generationResultsContainer.innerHTML = '';
+        fetch('/upload-image', { method: 'POST', body: formData })
         .then(response => response.json())
         .then(data => {
             spinnerContainer.style.display = 'none';
@@ -271,16 +385,22 @@
                 card.innerHTML = `<img src="${data.image_url}" alt="Uploaded Image">`;
                 generationResultsContainer.appendChild(card);
             } else {
-                generationResultsContainer.innerHTML = `<div class="result-card">${data.error || 'Error during upload'}</div>`;
+                generationResultsContainer.innerHTML = `<div class="result-card">${data.error || 'Error'}</div>`;
             }
         })
         .catch(error => {
             spinnerContainer.style.display = 'none';
-            generationResultsContainer.innerHTML = '<div class="result-card">Network error during upload.</div>';
+            generationResultsContainer.innerHTML = '<div class="result-card">Network error.</div>';
         });
     });
 
-    // --- Other Listeners & Initial Load ---
+    saveSettingsBtn.addEventListener('click', () => {
+        const brandVoice = brandVoiceInput.value;
+        localStorage.setItem('brandVoice', brandVoice);
+        saveSettingsBtn.textContent = 'Αποθηκεύτηκε!';
+        setTimeout(() => { saveSettingsBtn.textContent = 'Αποθήκευση Ρυθμίσεων'; }, 2000);
+    });
+    
     themeSwitch.addEventListener('click', () => {
         document.body.classList.toggle('dark-mode');
         if (document.body.classList.contains('dark-mode')) {
@@ -299,7 +419,9 @@
             document.body.classList.add('dark-mode');
             themeSwitch.textContent = '☀️';
         }
-        textTab.click(); // Start on the text tab
+        const savedBrandVoice = localStorage.getItem('brandVoice') || '';
+        brandVoiceInput.value = savedBrandVoice;
+        textTab.click();
     });
     </script>
 </body>
