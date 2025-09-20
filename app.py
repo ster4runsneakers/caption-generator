@@ -49,6 +49,7 @@ def sanitize_for_prompt(text: str, max_length: int = 500) -> str:
 
 # --- Configure other clients (Cloudinary, AI) ---
 cloudinary.config(cloud_name=os.getenv("CLOUDINARY_CLOUD_NAME"), api_key=os.getenv("CLOUDINARY_API_KEY"), api_secret=os.getenv("CLOUDINARY_API_SECRET"))
+OPENAI_RESPONSES_MODEL = os.getenv("OPENAI_RESPONSES_MODEL", "gpt-4o-mini")
 try:
     openai_client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
 except Exception as e:
@@ -150,9 +151,18 @@ def generate_caption():
             generated_text = response.text
         else:
             if not openai_client: raise ConnectionError("OpenAI client not initialized.")
-            # ## Η ΔΙΟΡΘΩΣΗ ΕΙΝΑΙ ΕΔΩ ##
-            chat_completion = openai_client.chat.completions.create(messages=[{"role": "user", "content": prompt}], model="gpt-3.5-turbo")
-            generated_text = chat_completion.choices[0].message.content
+            # Generate captions via the OpenAI Responses API using the gpt-4o-mini model (configurable via env).
+            response = openai_client.responses.create(
+                model=OPENAI_RESPONSES_MODEL,
+                input=[{"role": "user", "content": prompt}]
+            )
+            generated_text = getattr(response, "output_text", "")
+            if not generated_text:
+                segments = []
+                for item in getattr(response, "output", []) or []:
+                    if getattr(item, "type", "") == "output_text":
+                        segments.append(getattr(item, "text", ""))
+                generated_text = "".join(segments)
         return jsonify({"caption": generated_text.strip()})
     except Exception as e:
         print(f"Error during AI generation with {model_choice}: {e}")
