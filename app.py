@@ -40,6 +40,13 @@ class User(UserMixin, db.Model):
 def load_user(user_id):
     return db.session.get(User, int(user_id))
 
+# --- Βοηθητικές Συναρτήσεις (Helpers) ---
+def sanitize_for_prompt(text: str, max_length: int = 500) -> str:
+    """Καθαρίζει και περιορίζει το κείμενο του χρήστη για χρήση σε prompt."""
+    if not text:
+        return ""
+    return text.strip()[:max_length]
+
 # --- Configure other clients (Cloudinary, AI) ---
 cloudinary.config(cloud_name=os.getenv("CLOUDINARY_CLOUD_NAME"), api_key=os.getenv("CLOUDINARY_API_KEY"), api_secret=os.getenv("CLOUDINARY_API_SECRET"))
 try:
@@ -114,14 +121,17 @@ def upload_image():
 def generate_caption():
     data = request.get_json()
     if not data or 'topic' not in data: return jsonify({"error": "Topic is required"}), 400
-    topic = data.get('topic')
+    # Sanitize free-text inputs to mitigate prompt injection risks
+    topic = sanitize_for_prompt(data.get('topic'))
+    keywords = sanitize_for_prompt(data.get('keywords'))
+    brand_voice = sanitize_for_prompt(data.get('brand_voice', ''))
+
+    # Get other parameters (assumed to be from a fixed set of choices)
     platform = data.get('platform')
     tone = data.get('tone')
     content_type = data.get('contentType')
     language = data.get('language')
-    keywords = data.get('keywords')
     model_choice = data.get('model_choice', 'openai')
-    brand_voice = data.get('brand_voice', '')
     content_map = {'Caption': 'a full caption (including a hook, body, and CTA)','Hook': 'only a compelling hook','CTA': 'only a strong call-to-action (CTA)','Hashtags': 'a list of 10 relevant hashtags'}
     requested_content = content_map.get(content_type, 'a full caption')
     prompt = ""
