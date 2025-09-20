@@ -2,27 +2,34 @@
 <html lang="el">
 <head>
     <meta charset="UTF-8">
-    <title>Register</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Εγγραφή | AI Assistant</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 </head>
 <body>
     <div class="container">
         <h1>Εγγραφή</h1>
-        <form method="post" class="auth-form">
-            <input type="text" name="username" placeholder="Όνομα Χρήστη" required>
+        <form method="POST" class="auth-form">
+            <input type="text" name="username" placeholder="Όνομα χρήστη" required>
             <input type="password" name="password" placeholder="Κωδικός" required>
             <button type="submit">Εγγραφή</button>
         </form>
-        <p class="auth-switch">Έχεις ήδη λογαριασμό; <a href="{{ url_for('login') }}">Κάνε σύνδεση</a></p>
+
+        <div class="auth-switch">
+            <p>Έχεις ήδη λογαριασμό; <a href="{{ url_for('login') }}">Σύνδεση</a></p>
+        </div>
 
         {% with messages = get_flashed_messages() %}
-          {% if messages %}
-            <ul class="flashes">
-            {% for message in messages %}
-              <li>{{ message }}</li>
-            {% endfor %}
-            </ul>
-          {% endif %}
+            {% if messages %}
+                <ul class="flashes">
+                {% for msg in messages %}
+                    <li>{{ msg }}</li>
+                {% endfor %}
+                </ul>
+            {% endif %}
         {% endwith %}
     </div>
 </body>

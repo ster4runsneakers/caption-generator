@@ -1,113 +1,104 @@
 /* --- CSS Variables for Theming (Light & Dark Mode) --- */
 :root {
-    --bg-gradient-start: #f0f4f8;
-    --bg-gradient-end: #d9e2ec;
-    --container-bg: white;
-    --text-primary: #2c3e50;
-    --text-secondary: #7f8c8d;
-    --border-color: #dfe6e9;
-    --input-bg: #f8fafc;
-    --card-bg: #f8fafc;
-    --card-border: #e2e8f0;
-    --shadow-color: rgba(0, 0, 0, 0.1);
-    --button-secondary-bg: #e2e8f0;
-    --button-secondary-text: #5f6f81;
+  --bg-gradient-start: #f0f4f8;
+  --bg-gradient-end: #d9e2ec;
+  --container-bg: #fff;
+  --text-primary: #2c3e50;
+  --text-secondary: #7f8c8d;
+  --border-color: #dfe6e9;
+  --input-bg: #f8fafc;
+  --card-bg: #f8fafc;
+  --card-border: #e2e8f0;
+  --shadow-color: rgba(0, 0, 0, 0.1);
+  --button-secondary-bg: #e2e8f0;
+  --button-secondary-text: #5f6f81;
+  --brand: #3498db;
+  --brand-2: #2980b9;
+  --success-1: #27ae60;
+  --success-2: #2ecc71;
 }
 
 body.dark-mode {
-    --bg-gradient-start: #2c3e50;
-    --bg-gradient-end: #1a252f;
-    --container-bg: #2c3e50;
-    --text-primary: #ecf0f1;
-    --text-secondary: #95a5a6;
-    --border-color: #4a6278;
-    --input-bg: #34495e;
-    --card-bg: #34495e;
-    --card-border: #4a6278;
-    --shadow-color: rgba(0, 0, 0, 0.4);
-    --button-secondary-bg: #4a6278;
-    --button-secondary-text: #ecf0f1;
+  --bg-gradient-start: #2c3e50;
+  --bg-gradient-end: #1a252f;
+  --container-bg: #2c3e50;
+  --text-primary: #ecf0f1;
+  --text-secondary: #95a5a6;
+  --border-color: #4a6278;
+  --input-bg: #34495e;
+  --card-bg: #34495e;
+  --card-border: #4a6278;
+  --shadow-color: rgba(0, 0, 0, 0.4);
+  --button-secondary-bg: #4a6278;
+  --button-secondary-text: #ecf0f1;
 }
 
 /* --- General Style & Background --- */
+* { box-sizing: border-box; }
+html, body { height: 100%; }
+
 body {
-    font-family: 'Poppins', sans-serif;
-    background: linear-gradient(110deg, var(--bg-gradient-start), var(--bg-gradient-end));
-    color: var(--text-primary);
-    display: flex;
-    justify-content: center;
-    align-items: flex-start;
-    min-height: 100vh;
-    padding: 20px 15px;
-    margin: 0;
-    transition: background 0.3s, color 0.3s;
+  font-family: 'Poppins', sans-serif;
+  background: linear-gradient(110deg, var(--bg-gradient-start), var(--bg-gradient-end));
+  color: var(--text-primary);
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  min-height: 100vh;
+  padding: 20px 15px;
+  margin: 0;
+  transition: background 0.3s, color 0.3s;
 }
 
 /* --- Main Container & Theme Switch --- */
 .container {
-    background-color: var(--container-bg);
-    padding: 30px;
-    border-radius: 16px;
-    box-shadow: 0 8px 32px var(--shadow-color);
-    width: 100%;
-    max-width: 700px;
-    text-align: center;
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    position: relative;
-    transition: background-color 0.3s;
+  background-color: var(--container-bg);
+  padding: 30px;
+  border-radius: 16px;
+  box-shadow: 0 8px 32px var(--shadow-color);
+  width: 100%;
+  max-width: 760px;
+  text-align: center;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  position: relative;
+  transition: background-color 0.3s;
 }
 
 .theme-switch {
-    position: absolute;
-    top: 15px;
-    right: 15px;
-    cursor: pointer;
-    font-size: 22px;
+  position: absolute;
+  top: 15px;
+  right: 15px;
+  cursor: pointer;
+  font-size: 22px;
+  background: transparent;
+  border: 0;
 }
 
-h1 {
-    color: var(--text-primary);
-    font-weight: 600;
-    font-size: 28px;
+/* Headings / text */
+h1 { color: var(--text-primary); font-weight: 600; font-size: 28px; }
+h3, h4 {
+  color: var(--text-primary);
+  font-size: 18px; margin: 0 0 15px; font-weight: 600; text-align: left;
 }
-
-h3 {
-    color: var(--text-primary);
-    font-size: 18px;
-    margin-top: 0;
-    margin-bottom: 15px;
-    font-weight: 600;
-    text-align: left;
-}
-
-p {
-    color: var(--text-secondary);
-    margin-bottom: 30px;
-}
+p { color: var(--text-secondary); margin-bottom: 30px; }
 
 /* --- Main App Tabs --- */
 .app-tabs {
-    display: flex;
-    border-bottom: 2px solid var(--border-color);
-    margin-bottom: 30px;
+  display: flex;
+  border-bottom: 2px solid var(--border-color);
+  margin-bottom: 30px;
 }
-
 .app-tabs button {
-    background: none;
-    border: none;
-    padding: 15px 10px;
-    font-size: 16px;
-    font-weight: 600;
-    cursor: pointer;
-    color: var(--text-secondary);
-    border-bottom: 4px solid transparent;
-    transition: color 0.3s, border-color 0.3s;
-    flex-grow: 1;
+  background: none; border: none;
+  padding: 15px 10px; font-size: 16px; font-weight: 600;
+  cursor: pointer; color: var(--text-secondary);
+  border-bottom: 4px solid transparent;
+  transition: color 0.3s, border-color 0.3s;
+  flex-grow: 1;
 }
-
 .app-tabs button.active {
-    color: var(--text-primary);
-    border-bottom-color: #3498db;
+  color: var(--text-primary);
+  border-bottom-color: var(--brand);
 }
 
 /* --- View Containers --- */
@@ -117,341 +108,242 @@ p {
 
 /* --- Form Controls Layout --- */
 .form-controls {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 15px;
-    margin-bottom: 20px;
+  display: flex; flex-wrap: wrap; gap: 15px; margin-bottom: 20px;
 }
-
 .form-controls input[type="text"],
 .form-controls select,
 textarea {
-    width: 100%;
-    padding: 12px 15px;
-    border: 1px solid var(--border-color);
-    border-radius: 8px;
-    font-size: 16px;
-    box-sizing: border-box;
-    background-color: var(--input-bg);
-    color: var(--text-primary);
-    font-family: 'Poppins', sans-serif;
-    transition: border-color 0.3s, box-shadow 0.3s, background-color 0.3s, color 0.3s;
+  width: 100%;
+  padding: 12px 15px; border: 1px solid var(--border-color); border-radius: 8px;
+  font-size: 16px; background-color: var(--input-bg); color: var(--text-primary);
+  font-family: 'Poppins', sans-serif;
+  transition: border-color 0.3s, box-shadow 0.3s, background-color 0.3s, color 0.3s;
 }
-
-textarea {
-    resize: vertical;
-    min-height: 120px;
-}
-
+textarea { resize: vertical; min-height: 120px; }
 .form-controls input[type="text"] { flex: 2 1 250px; }
 .form-controls select { flex: 1 1 150px; }
 
-input:focus, select:focus, textarea:focus {
-    outline: none;
-    border-color: #3498db;
-    box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.2);
+input:focus, select:focus, textarea:focus, button:focus-visible {
+  outline: none;
+  border-color: var(--brand);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--brand) 20%, transparent);
 }
 
-/* --- Generate & Upload Buttons --- */
+/* --- Buttons --- */
 #generate-text-btn, #generate-image-btn, #upload-btn, #save-settings-btn {
-    background: linear-gradient(45deg, #3498db, #2980b9);
-    color: white;
-    border: none;
-    padding: 14px 28px;
-    border-radius: 8px;
-    font-size: 16px;
-    font-weight: 600;
-    cursor: pointer;
-    transition: transform 0.2s, box-shadow 0.2s;
-    width: 100%;
+  background: linear-gradient(45deg, var(--brand), var(--brand-2));
+  color: #fff; border: none; padding: 14px 28px; border-radius: 8px;
+  font-size: 16px; font-weight: 600; cursor: pointer;
+  transition: transform 0.2s, box-shadow 0.2s, opacity 0.2s;
+  width: 100%;
 }
-
 #generate-text-btn:hover, #generate-image-btn:hover, #upload-btn:hover, #save-settings-btn:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 6px 20px rgba(52, 152, 219, 0.3);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(52, 152, 219, 0.3);
+}
+#generate-text-btn:disabled, #generate-image-btn:disabled, #upload-btn:disabled, #save-settings-btn:disabled {
+  opacity: .6; cursor: not-allowed; transform: none; box-shadow: none;
 }
 
 /* --- Image View Sections --- */
 .form-section {
-    background-color: var(--card-bg);
-    border: 1px solid var(--card-border);
-    border-radius: 12px;
-    padding: 20px;
-    margin-bottom: 25px;
-    transition: background-color 0.3s, border-color 0.3s;
+  background-color: var(--card-bg);
+  border: 1px solid var(--card-border);
+  border-radius: 12px;
+  padding: 20px;
+  margin-bottom: 25px;
+  transition: background-color 0.3s, border-color 0.3s;
 }
-
-.upload-section {
-    display: flex;
-    flex-wrap: wrap;
-    align-items: center;
-    gap: 15px;
-}
-
-input[type="file"] {
-    display: none; /* Hide the default input */
-}
-
+.upload-section { display: flex; flex-wrap: wrap; align-items: center; gap: 15px; }
+input[type="file"] { display: none; }
 .file-label {
-    background-color: var(--button-secondary-bg);
-    color: var(--button-secondary-text);
-    padding: 12px 20px;
-    border-radius: 8px;
-    cursor: pointer;
-    transition: background-color 0.3s, color 0.3s;
-    text-align: center;
-    flex-grow: 1;
-    font-weight: 600;
+  background-color: var(--button-secondary-bg);
+  color: var(--button-secondary-text);
+  padding: 12px 20px; border-radius: 8px; cursor: pointer; text-align: center;
+  flex-grow: 1; font-weight: 600; transition: background-color 0.3s, color 0.3s;
 }
-
-.file-label:hover {
-    background-color: #3498db;
-    color: white;
-}
-
+.file-label:hover { background-color: var(--brand); color: #fff; }
 
 /* --- Results Area --- */
-#generation-results-container, #history-results-container {
-    margin-top: 30px;
-    text-align: left;
+#generation-results, #history-results-container {  /* <-- διόρθωση ID */
+  margin-top: 30px;
+  text-align: left;
 }
-
 .result-card {
-    background-color: var(--card-bg);
-    border: 1px solid var(--card-border);
-    border-radius: 12px;
-    padding: 20px 85px 20px 20px;
-    margin-bottom: 15px;
-    position: relative;
-    line-height: 1.6;
-    white-space: pre-wrap;
-    font-size: 15px;
-    transition: background-color 0.3s, border-color 0.3s;
-    display: flex;
-    align-items: center;
+  background-color: var(--card-bg);
+  border: 1px solid var(--card-border);
+  border-radius: 12px;
+  padding: 20px 20px;
+  margin-bottom: 15px;
+  line-height: 1.6;
+  white-space: pre-wrap;
+  font-size: 15px;
+  transition: background-color 0.3s, border-color 0.3s;
+  display: flex;
+  align-items: center;
+  gap: 12px;
 }
-
 #image-result-card { padding: 10px; text-align: center; }
 #image-result-card img { max-width: 100%; border-radius: 8px; }
-
-.card-actions {
-    position: absolute;
-    top: 50%;
-    transform: translateY(-50%);
-    right: 15px;
-    display: flex;
-    gap: 8px;
+.analyze-btn {
+  background: linear-gradient(45deg, var(--success-1), var(--success-2)) !important;
+  margin-top: 15px;
+  color: #fff;
+}
+.analyze-btn:hover {
+  box-shadow: 0 6px 20px rgba(46, 204, 113, 0.4) !important;
 }
 
-.copy-btn, .fav-btn {
-    background-color: var(--button-secondary-bg);
-    color: var(--button-secondary-text);
-    border: none;
-    border-radius: 6px;
-    padding: 6px 12px;
-    cursor: pointer;
-    transition: background-color 0.3s, color 0.3s, transform 0.2s;
-    font-size: 14px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
+/* card buttons (ευθυγράμμιση με JS) */
+.card-buttons {
+  margin-left: auto;
+  display: flex;
+  gap: 8px;
 }
-
-.copy-btn:hover, .fav-btn:hover {
-    background-color: #3498db;
-    color: white;
-    transform: scale(1.1);
+.card-buttons button {
+  background-color: var(--button-secondary-bg);
+  color: var(--button-secondary-text);
+  border: none; border-radius: 6px; padding: 6px 12px; cursor: pointer;
+  transition: background-color 0.3s, color 0.3s, transform 0.2s;
+  font-size: 14px; display: inline-flex; align-items: center; justify-content: center;
 }
-
-.fav-btn.favorited {
-    background-color: #f1c40f;
-    color: white;
+.card-buttons button:hover {
+  background-color: var(--brand);
+  color: #fff;
+  transform: scale(1.06);
 }
 
 /* --- History/Favorites Tabs & Search --- */
 .history-controls {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    flex-wrap: wrap;
-    gap: 15px;
-    border-bottom: 2px solid var(--border-color);
-    padding-bottom: 10px;
-    margin-bottom: 20px;
+  display: flex; justify-content: space-between; align-items: center;
+  flex-wrap: wrap; gap: 15px; border-bottom: 2px solid var(--border-color);
+  padding-bottom: 10px; margin-bottom: 20px;
 }
-
-.history-controls .tabs {
-    display: flex;
-    gap: 10px;
-}
-
+.history-controls .tabs { display: flex; gap: 10px; }
 .history-controls .tabs button {
-    background: var(--button-secondary-bg);
-    border: 1px solid var(--border-color);
-    font-size: 14px;
-    padding: 8px 16px;
-    cursor: pointer;
-    color: var(--text-secondary);
-    border-radius: 8px;
-    transition: color 0.3s, background-color 0.3s, border-color 0.3s;
-    font-weight: 600;
+  background: var(--button-secondary-bg);
+  border: 1px solid var(--border-color);
+  font-size: 14px; padding: 8px 16px; cursor: pointer;
+  color: var(--text-secondary);
+  border-radius: 8px; font-weight: 600;
+  transition: color 0.3s, background-color 0.3s, border-color 0.3s;
 }
-
 .history-controls .tabs button.active {
-    color: white;
-    background: linear-gradient(45deg, #3498db, #2980b9);
-    border-color: transparent;
+  color: #fff; background: linear-gradient(45deg, var(--brand), var(--brand-2));
+  border-color: transparent;
 }
-
 #search-history {
-    border: 1px solid var(--border-color);
-    border-radius: 8px;
-    padding: 8px 12px;
-    font-size: 14px;
-    background-color: var(--input-bg);
-    color: var(--text-primary);
-    flex-grow: 1;
-    min-width: 150px;
+  border: 1px solid var(--border-color);
+  border-radius: 8px; padding: 8px 12px; font-size: 14px;
+  background-color: var(--input-bg); color: var(--text-primary);
+  flex-grow: 1; min-width: 150px;
 }
+
 /* --- Calendar Styles --- */
-#calendar-container {
-    display: flex;
-    gap: 20px;
-    flex-wrap: wrap;
-}
-
+#calendar-container { display: flex; gap: 20px; flex-wrap: wrap; }
 #calendar-sidebar {
-    flex: 1 1 220px;
-    background-color: var(--input-bg);
-    border-radius: 12px;
-    padding: 15px;
-    height: 500px;
-    overflow-y: auto;
+  flex: 1 1 220px; background-color: var(--input-bg);
+  border-radius: 12px; padding: 15px; height: 500px; overflow-y: auto;
 }
-
 #calendar-sidebar h4 {
-    margin-top: 0;
-    text-align: center;
-    border-bottom: 2px solid var(--border-color);
-    padding-bottom: 10px;
+  margin-top: 0; text-align: center; border-bottom: 2px solid var(--border-color); padding-bottom: 10px;
 }
-
 .favorite-item {
-    background-color: var(--card-bg);
-    border: 1px solid var(--card-border);
-    border-radius: 8px;
-    padding: 10px;
-    margin-bottom: 10px;
-    cursor: grab;
-    font-size: 14px;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
+  background-color: var(--card-bg);
+  border: 1px solid var(--card-border);
+  border-radius: 8px;
+  padding: 10px; margin-bottom: 10px; cursor: grab;
+  font-size: 14px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
 }
-
-#calendar-main {
-    flex: 3 1 400px;
-}
-
+#calendar-main { flex: 3 1 400px; }
 .calendar-grid {
-    display: grid;
-    grid-template-columns: repeat(7, 1fr);
-    gap: 5px;
+  display: grid; grid-template-columns: repeat(7, 1fr); gap: 5px;
 }
-
 .calendar-day-header {
-    font-size: 12px;
-    font-weight: 600;
-    text-align: center;
-    color: var(--text-secondary);
-    padding-bottom: 5px;
+  font-size: 12px; font-weight: 600; text-align: center; color: var(--text-secondary); padding-bottom: 5px;
 }
-
 .calendar-day {
-    border: 1px solid var(--border-color);
-    border-radius: 8px;
-    min-height: 100px;
-    padding: 5px;
-    transition: background-color 0.3s;
-    display: flex;
-    flex-direction: column;
+  border: 1px solid var(--border-color);
+  border-radius: 8px; min-height: 100px; padding: 5px;
+  transition: background-color 0.3s; display: flex; flex-direction: column;
 }
-
-.day-number {
-    font-size: 14px;
-    font-weight: 600;
-    align-self: flex-end;
-    margin-bottom: 4px;
-}
-
-.calendar-day.drag-over {
-    background-color: rgba(52, 152, 219, 0.2);
-    border-style: dashed;
-}
-
+.day-number { font-size: 14px; font-weight: 600; align-self: flex-end; margin-bottom: 4px; }
+.calendar-day.drag-over { background-color: color-mix(in srgb, var(--brand) 20%, transparent); border-style: dashed; }
 .scheduled-item {
-    background-color: #3498db;
-    color: white;
-    font-size: 12px;
-    padding: 3px 6px;
-    border-radius: 4px;
-    margin-top: 5px;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    cursor: default;
+  background-color: var(--brand); color: #fff; font-size: 12px; padding: 3px 6px;
+  border-radius: 4px; margin-top: 5px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; cursor: default;
 }
-
 
 /* --- Spinner --- */
+/* αρχικά κρυφό — θα το δείχνει το JS με display:flex */
 .spinner-container {
-    display: none; min-height: 150px; justify-content: center; align-items: center;
+  display: none;
+  min-height: 150px;
+  justify-content: center;
+  align-items: center;
 }
 .spinner {
-    border: 6px solid #f3f3f3; border-top: 6px solid #3498db;
-    border-radius: 50%; width: 50px; height: 50px;
-    animation: spin 1s linear infinite;
+  border: 6px solid #f3f3f3;
+  border-top: 6px solid var(--brand);
+  border-radius: 50%;
+  width: 50px; height: 50px;
+  animation: spin 1s linear infinite;
 }
-@keyframes spin {
-    0% { transform: rotate(0deg); }
-    100% { transform: rotate(360deg); }
+@keyframes spin { to { transform: rotate(360deg); } }
+
+/* --- Mobile Responsive --- */
+@media (max-width: 600px) {
+  body { padding: 10px; }
+  .container { padding: 20px; }
+  h1 { font-size: 24px; }
+  .app-tabs button { font-size: 12px; padding: 12px 2px; }
+  .history-controls { flex-direction: column; align-items: stretch; }
+  #calendar-container { flex-direction: column; }
+  #calendar-sidebar { height: auto; max-height: 250px; }
+  .calendar-day { min-height: 80px; padding: 3px; }
+  .scheduled-item { font-size: 10px; }
+  .upload-section { flex-direction: column; align-items: stretch; }
 }
 
-/* --- Mobile Responsive Design --- */
-@media (max-width: 600px) {
-    body {
-        padding: 10px;
-    }
-    .container {
-        padding: 20px;
-    }
-    h1 {
-        font-size: 24px;
-    }
-    .app-tabs button {
-        font-size: 12px;
-        padding: 12px 2px;
-    }
-    .history-controls {
-        flex-direction: column;
-        align-items: stretch;
-    }
-    #calendar-container {
-        flex-direction: column;
-    }
-    #calendar-sidebar {
-        height: auto;
-        max-height: 250px;
-    }
-    .calendar-day {
-        min-height: 80px;
-        padding: 3px;
-    }
-    .scheduled-item {
-        font-size: 10px;
-    }
-    .upload-section {
-        flex-direction: column;
-        align-items: stretch;
-    }
+/* --- User Auth Links (αν βάλεις link logout/login στο index) --- */
+.user-auth {
+  position: absolute; top: 22px; left: 30px;
+  font-size: 14px; font-weight: 600; z-index: 10;
+}
+.user-auth a {
+  color: var(--text-secondary); text-decoration: none; margin-left: 15px; transition: color 0.3s;
+}
+.user-auth a:hover { color: var(--brand); }
+.user-auth span { color: var(--text-primary); }
+
+/* --- Styles for Login/Register Pages --- */
+body.auth {
+  display: flex; align-items: center; justify-content: center;
+}
+.auth-card {
+  width: 100%; max-width: 420px;
+  background: var(--container-bg);
+  border: 1px solid var(--card-border);
+  border-radius: 16px; padding: 28px;
+  box-shadow: 0 8px 32px var(--shadow-color);
+}
+.auth-card h2 { margin: 0 0 16px; color: var(--text-primary); }
+.auth-card .muted { color: var(--text-secondary); font-size: 14px; }
+.auth-card a { color: var(--brand); text-decoration: none; }
+.auth-card a:hover { text-decoration: underline; }
+
+.auth-form, .auth-card form {
+  display: flex; flex-direction: column; gap: 15px; margin-top: 10px;
+}
+.auth-card input {
+  width: 100%; padding: 12px 15px; border: 1px solid var(--border-color); border-radius: 8px;
+  font-size: 16px; background-color: var(--input-bg); color: var(--text-primary);
+}
+.auth-card button {
+  background: linear-gradient(45deg, var(--brand), var(--brand-2)); color: #fff;
+  border: 0; padding: 12px 20px; border-radius: 8px; font-weight: 600; cursor: pointer;
+}
+.flash, .flashes {
+  list-style: none; padding: 0; margin: 12px 0 0;
+  color: #e74c3c; font-size: 14px;
 }

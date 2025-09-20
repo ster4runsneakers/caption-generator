@@ -1,455 +1,491 @@
 <!DOCTYPE html>
 <html lang="el">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AI Social Media Assistant v2.3</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>AI Social Media Assistant v3.1</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet"/>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}"/>
 </head>
 <body>
 
-    <div class="container">
-        <div class="theme-switch" id="theme-switch" title="Toggle dark mode">🌙</div>
-        <h1>AI Social Media Assistant v3.0</h1>
+  <!-- Auth links -->
+  <div class="user-auth">
+    {% if current_user.is_authenticated %}
+      <span>👋 Γεια σου, {{ current_user.username }}!</span>
+      <a href="{{ url_for('logout') }}">Αποσύνδεση</a>
+    {% else %}
+      <a href="{{ url_for('login') }}">Σύνδεση</a>
+      <a href="{{ url_for('register') }}">Εγγραφή</a>
+    {% endif %}
+  </div>
 
-        <div class="app-tabs">
-            <button id="tab-text" class="active">Δημιουργία Κειμένου</button>
-            <button id="tab-image">Δημιουργία Εικόνας</button>
-            <button id="tab-calendar">Ημερολόγιο</button>
-            <button id="tab-history">Ιστορικό</button>
-            <button id="tab-settings">Ρυθμίσεις</button>
-        </div>
-        
-        <div class="view-content">
-            <div id="view-text" class="view-container active">
-                <p>Δημιούργησε Hooks, CTAs και Captions για τα social media σου.</p>
-                <div class="form-controls">
-                    <input type="text" id="topic-input" placeholder="Κύριο θέμα...">
-                    <input type="text" id="keywords" placeholder="Λέξεις-κλειδιά...">
-                    <select id="platform-select">
-                        <option value="Instagram">Instagram</option>
-                        <option value="TikTok">TikTok</option>
-                        <option value="Facebook">Facebook</option>
-                        <option value="Pinterest">Pinterest</option>
-                        <option value="YouTube">YouTube</option>
-                    </select>
-                    <select id="content-type-select">
-                        <option value="Caption">Full Caption</option>
-                        <option value="Hook">Μόνο Hook</option>
-                        <option value="CTA">Μόνο CTA</option>
-                        <option value="Hashtags">Μόνο Hashtags</option>
-                    </select>
-                    <select id="tone-select">
-                        <option value="Friendly">Φιλικό</option>
-                        <option value="Professional">Επαγγελματικό</option>
-                        <option value="Funny">Αστείο</option>
-                        <option value="Enthusiastic">Ενθουσιώδες</option>
-                    </select>
-                    <select id="language-select">
-                        <option value="Greek">Ελληνικά</option>
-                        <option value="English">Αγγλικά</option>
-                    </select>
-                    <select id="model-select" title="Choose your AI engine">
-                        <option value="openai">OpenAI (GPT-3.5)</option>
-                        <option value="gemini">Google (Gemini)</option>
-                    </select>
-                </div>
-                <button id="generate-text-btn">Δημιουργία Κειμένου</button>
-            </div>
+  <div class="container">
+    <button id="theme-switch" class="theme-switch" title="Εναλλαγή dark mode" aria-pressed="false" type="button">🌙</button>
+    <h1>AI Social Media Assistant v3.1</h1>
 
-            <div id="view-image" class="view-container">
-                 <div class="form-section">
-                    <h3>Δημιουργία με AI</h3>
-                    <p>Περιέγραψε την εικόνα που θέλεις να δημιουργήσει το AI.</p>
-                    <div class="form-controls">
-                        <input type="text" id="image-prompt-input" placeholder="π.χ., Ένας αστροναύτης σε μια παραλία, ρεαλιστικό στυλ...">
-                        <select id="image-style-select">
-                            <option value="photorealistic">Φωτορεαλιστικό</option>
-                            <option value="digital art">Digital Art</option>
-                            <option value="cartoon">Cartoon</option>
-                            <option value="fantasy">Fantasy</option>
-                            <option value="3d render">3D Render</option>
-                        </select>
-                    </div>
-                    <button id="generate-image-btn">Δημιουργία Εικόνας με AI</button>
-                </div>
-                <div class="form-section">
-                    <h3>Ανέβασμα Δικής σου Εικόνας</h3>
-                    <div class="upload-section">
-                        <input type="file" id="file-input" accept="image/png, image/jpeg">
-                        <label for="file-input" class="file-label">Επίλεξε Φωτογραφία</label>
-                        <button id="upload-btn">Ανέβασμα Φωτογραφίας</button>
-                    </div>
-                </div>
-            </div>
-            
-            <div id="view-calendar" class="view-container">
-                <p>Οργάνωσε τα αγαπημένα σου posts. Κάνε drag & drop ένα caption από τη λίστα σε μια μέρα του ημερολογίου.</p>
-                <div id="calendar-container">
-                    <div id="calendar-sidebar">
-                        <h4>⭐ Αγαπημένα</h4>
-                        <div id="favorites-list"></div>
-                    </div>
-                    <div id="calendar-main">
-                        <div class="calendar-grid" id="calendar-grid"></div>
-                    </div>
-                </div>
-            </div>
-
-            <div id="view-history" class="view-container">
-                 <div class="history-controls">
-                    <div class="tabs">
-                        <button id="subtab-history" class="active">Ιστορικό</button>
-                        <button id="subtab-favorites">Αγαπημένα</button>
-                    </div>
-                    <input type="text" id="search-history" placeholder="Αναζήτηση...">
-                </div>
-                <div id="history-results-container"></div>
-            </div>
-            
-            <div id="view-settings" class="view-container">
-                <h3>Η Φωνή του Brand σου (Brand Voice)</h3>
-                <p>Περιέγραψε το ύφος και την προσωπικότητα του brand σου. Το AI θα ακολουθεί πάντα αυτές τις οδηγίες.</p>
-                <textarea id="brand-voice-input" rows="6" placeholder="π.χ., Είμαστε ένα παιχνιδιάρικο brand. Χρησιμοποιούμε απλή γλώσσα, πολλά emojis και πάντα χιούμορ..."></textarea>
-                <button id="save-settings-btn">Αποθήκευση Ρυθμίσεων</button>
-            </div>
-        </div> 
-
-        <div id="spinner-container" class="spinner-container"><div class="spinner"></div></div>
-        <div id="generation-results-container"></div>
+    <!-- Tabs -->
+    <div class="app-tabs" role="tablist" aria-label="Κύριες Λειτουργίες">
+      <button id="tab-text" class="active" role="tab" aria-selected="true" type="button">Δημιουργία Κειμένου</button>
+      <button id="tab-image" role="tab" aria-selected="false" type="button">Δημιουργία Εικόνας</button>
+      <button id="tab-calendar" role="tab" aria-selected="false" type="button">Ημερολόγιο</button>
+      <button id="tab-history" role="tab" aria-selected="false" type="button">Ιστορικό</button>
+      <button id="tab-settings" role="tab" aria-selected="false" type="button">Ρυθμίσεις</button>
     </div>
 
-    <script>
-    // --- ΒΗΜΑ 1: ΟΡΙΣΜΟΣ ΟΛΩΝ ΤΩΝ ΜΕΤΑΒΛΗΤΩΝ ΣΤΗΝ ΑΡΧΗ ---
+    <div class="view-content">
+      <!-- TEXT -->
+      <section id="view-text" class="view-container active" role="tabpanel" aria-labelledby="tab-text">
+        <p>Δημιούργησε Hooks, CTAs και Captions για τα social media σου.</p>
+        <div class="form-controls">
+          <input type="text" id="topic-input" placeholder="Κύριο θέμα..." autocomplete="off"/>
+          <input type="text" id="keywords" placeholder="Λέξεις-κλειδιά..." autocomplete="off"/>
+          <select id="platform-select">
+            <option value="Instagram">Instagram</option>
+            <option value="TikTok">TikTok</option>
+            <option value="Facebook">Facebook</option>
+            <option value="Pinterest">Pinterest</option>
+            <option value="YouTube">YouTube</option>
+          </select>
+          <select id="content-type-select">
+            <option value="Caption">Full Caption</option>
+            <option value="Hook">Μόνο Hook</option>
+            <option value="CTA">Μόνο CTA</option>
+            <option value="Hashtags">Μόνο Hashtags</option>
+          </select>
+          <select id="tone-select">
+            <option value="Friendly">Φιλικό</option>
+            <option value="Professional">Επαγγελματικό</option>
+            <option value="Funny">Αστείο</option>
+            <option value="Enthusiastic">Ενθουσιώδες</option>
+          </select>
+          <select id="language-select">
+            <option value="Greek">Ελληνικά</option>
+            <option value="English">Αγγλικά</option>
+          </select>
+          <select id="model-select" title="Choose your AI engine">
+            <option value="openai">OpenAI (GPT-4o mini)</option>
+            <option value="gemini">Google (Gemini)</option>
+          </select>
+        </div>
+        <button id="generate-text-btn" type="button">Δημιουργία Κειμένου</button>
+      </section>
+
+      <!-- IMAGE -->
+      <section id="view-image" class="view-container" role="tabpanel" aria-labelledby="tab-image">
+        <div class="form-section">
+          <h3>Δημιουργία με AI</h3>
+          <p>Περιέγραψε την εικόνα που θέλεις να δημιουργήσει το AI.</p>
+          <div class="form-controls">
+            <input type="text" id="image-prompt-input" placeholder="π.χ., Ένας αστροναύτης σε μια παραλία, ρεαλιστικό στυλ..." autocomplete="off"/>
+            <select id="image-style-select">
+              <option value="photorealistic">Φωτορεαλιστικό</option>
+              <option value="digital art">Digital Art</option>
+              <option value="cartoon">Cartoon</option>
+              <option value="fantasy">Fantasy</option>
+              <option value="3d render">3D Render</option>
+            </select>
+          </div>
+          <button id="generate-image-btn" type="button">Δημιουργία Εικόνας με AI</button>
+        </div>
+        <div class="form-section">
+          <h3>Ανέβασμα Δικής σου Εικόνας</h3>
+          <div class="upload-section">
+            <input type="file" id="file-input" accept="image/png, image/jpeg"/>
+            <label for="file-input" class="file-label">Επίλεξε Φωτογραφία</label>
+            <button id="upload-btn" type="button">Ανέβασμα Φωτογραφίας</button>
+          </div>
+        </div>
+      </section>
+
+      <!-- CALENDAR -->
+      <section id="view-calendar" class="view-container" role="tabpanel" aria-labelledby="tab-calendar">
+        <p>Οργάνωσε τα αγαπημένα σου posts. Κάνε drag & drop ένα caption από τη λίστα σε μια μέρα του ημερολογίου.</p>
+        <div id="calendar-container">
+          <aside id="calendar-sidebar" aria-label="Αγαπημένα">
+            <h4>⭐ Αγαπημένα</h4>
+            <div id="favorites-list"></div>
+          </aside>
+          <div id="calendar-main">
+            <div class="calendar-grid" id="calendar-grid" aria-label="Πίνακας Ημερολογίου"></div>
+          </div>
+        </div>
+      </section>
+
+      <!-- HISTORY -->
+      <section id="view-history" class="view-container" role="tabpanel" aria-labelledby="tab-history">
+        <div class="history-controls">
+          <div class="tabs" role="tablist">
+            <button id="subtab-history" class="active" role="tab" aria-selected="true" type="button">Ιστορικό</button>
+            <button id="subtab-favorites" role="tab" aria-selected="false" type="button">Αγαπημένα</button>
+          </div>
+          <input type="text" id="search-history" placeholder="Αναζήτηση..." autocomplete="off" aria-label="Αναζήτηση στο ιστορικό"/>
+        </div>
+        <div id="history-results-container" aria-live="polite"></div>
+      </section>
+
+      <!-- SETTINGS -->
+      <section id="view-settings" class="view-container" role="tabpanel" aria-labelledby="tab-settings">
+        <h3>Η Φωνή του Brand σου (Brand Voice)</h3>
+        <p>Περιέγραψε το ύφος και την προσωπικότητα του brand σου. Το AI θα ακολουθεί πάντα αυτές τις οδηγίες.</p>
+        <textarea id="brand-voice-input" rows="6" placeholder="π.χ., Είμαστε ένα παιχνιδιάρικο brand. Χρησιμοποιούμε απλή γλώσσα, πολλά emojis και πάντα χιούμορ..."></textarea>
+        <button id="save-settings-btn" type="button">Αποθήκευση Ρυθμίσεων</button>
+      </section>
+    </div>
+
+    <!-- Spinner & Results -->
+    <div id="spinner-container" class="spinner-container" aria-hidden="true" style="display:none;">
+      <div class="spinner" role="status" aria-label="Παρακαλώ περιμένετε"></div>
+    </div>
+    <div id="generation-results" aria-live="polite"></div>
+  </div>
+
+  <!-- JavaScript -->
+  <script>
+    // --- Elements ---
+    const themeSwitch = document.getElementById('theme-switch');
     const textTab = document.getElementById('tab-text');
     const imageTab = document.getElementById('tab-image');
     const calendarTab = document.getElementById('tab-calendar');
     const historyTab = document.getElementById('tab-history');
     const settingsTab = document.getElementById('tab-settings');
-    
+
     const textView = document.getElementById('view-text');
     const imageView = document.getElementById('view-image');
     const calendarView = document.getElementById('view-calendar');
     const historyView = document.getElementById('view-history');
     const settingsView = document.getElementById('view-settings');
-    
+
     const generateTextBtn = document.getElementById('generate-text-btn');
     const generateImageBtn = document.getElementById('generate-image-btn');
     const uploadBtn = document.getElementById('upload-btn');
-    const saveSettingsBtn = document.getElementById('save-settings-btn');
+    const fileInput = document.getElementById('file-input');
 
-    const generationResultsContainer = document.getElementById('generation-results-container');
-    const historyResultsContainer = document.getElementById('history-results-container');
     const spinnerContainer = document.getElementById('spinner-container');
-    const themeSwitch = document.getElementById('theme-switch');
-    const searchInput = document.getElementById('search-history');
+    const generationResultsContainer = document.getElementById('generation-results');
+
     const historySubTab = document.getElementById('subtab-history');
     const favoritesSubTab = document.getElementById('subtab-favorites');
-    const fileInput = document.getElementById('file-input');
+    const searchInput = document.getElementById('search-history');
     const brandVoiceInput = document.getElementById('brand-voice-input');
+    const saveSettingsBtn = document.getElementById('save-settings-btn');
     const favoritesList = document.getElementById('favorites-list');
     const calendarGrid = document.getElementById('calendar-grid');
 
     let currentHistoryView = 'history';
 
-    // --- ΒΗΜΑ 2: ΟΡΙΣΜΟΣ ΟΛΩΝ ΤΩΝ ΣΥΝΑΡΤΗΣΕΩΝ ---
-    const getStorage = (key) => JSON.parse(localStorage.getItem(key)) || [];
-    const setStorage = (key, value) => localStorage.setItem(key, JSON.stringify(value));
+    // Storage helpers
+    function getStorage(key) {
+      try { return JSON.parse(localStorage.getItem(key) || '[]'); }
+      catch { return []; }
+    }
+    function setStorage(key, value) { localStorage.setItem(key, JSON.stringify(value)); }
+    function saveToHistory(items) {
+      const history = getStorage('history');
+      const updated = [...items, ...history].slice(0, 50);
+      setStorage('history', updated);
+    }
 
+    // UI helpers
     function createResultCard(text, isFavorite, container) {
-        const card = document.createElement('div'); card.className = 'result-card';
-        const textSpan = document.createElement('span'); textSpan.textContent = text.trim();
-        const actionsDiv = document.createElement('div'); actionsDiv.className = 'card-actions';
-        const copyBtn = document.createElement('button'); copyBtn.className = 'copy-btn'; copyBtn.innerHTML = '📋'; copyBtn.title = 'Copy';
-        copyBtn.onclick = () => { navigator.clipboard.writeText(textSpan.textContent); copyBtn.innerHTML = '✅'; setTimeout(() => { copyBtn.innerHTML = '📋'; }, 2000); };
-        const favBtn = document.createElement('button'); favBtn.className = `fav-btn ${isFavorite ? 'favorited' : ''}`; favBtn.innerHTML = isFavorite ? '⭐' : '☆'; favBtn.title = 'Favorite';
-        favBtn.onclick = () => toggleFavorite(text, favBtn);
-        actionsDiv.appendChild(copyBtn); actionsDiv.appendChild(favBtn); card.appendChild(textSpan); card.appendChild(actionsDiv);
-        container.appendChild(card);
+      const card = document.createElement('div');
+      card.className = 'result-card';
+      const p = document.createElement('p');
+      p.textContent = text;
+      const btns = document.createElement('div');
+      btns.className = 'card-buttons';
+
+      const copy = document.createElement('button');
+      copy.type = 'button';
+      copy.textContent = '📋 Αντιγραφή';
+      copy.addEventListener('click', () => {
+        navigator.clipboard.writeText(text);
+        copy.textContent = '✅ Αντιγράφηκε!';
+        setTimeout(() => copy.textContent = '📋 Αντιγραφή', 1500);
+      });
+
+      const fav = document.createElement('button');
+      fav.type = 'button';
+      fav.textContent = isFavorite ? '★ Αγαπημένο' : '☆ Προσθήκη';
+      fav.addEventListener('click', () => toggleFavorite(text));
+
+      btns.appendChild(copy);
+      btns.appendChild(fav);
+      card.appendChild(p);
+      card.appendChild(btns);
+
+      card.draggable = true;
+      card.addEventListener('dragstart', e => e.dataTransfer.setData('text/plain', text));
+
+      container.appendChild(card);
     }
 
-    function renderHistory(filter = '') {
-        historyResultsContainer.innerHTML = '';
-        const favorites = getStorage('favorites');
-        const items = (currentHistoryView === 'history') ? getStorage('history') : favorites;
-        const filteredItems = items.filter(item => item.toLowerCase().includes(filter.toLowerCase()));
-        filteredItems.forEach(item => {
-            const isFav = favorites.includes(item);
-            createResultCard(item, isFav, historyResultsContainer);
-        });
+    function renderHistory(q = '') {
+      const container = document.getElementById('history-results-container');
+      container.innerHTML = '';
+      const data = getStorage(currentHistoryView);
+      const favorites = getStorage('favorites');
+      data.filter(t => t.toLowerCase().includes(q.toLowerCase()))
+          .forEach(t => createResultCard(t, favorites.includes(t), container));
     }
 
-    function saveToHistory(newCaptions) {
-        let history = getStorage('history');
-        history = [...newCaptions, ...history];
-        if (history.length > 50) history = history.slice(0, 50);
-        setStorage('history', history);
+    function toggleFavorite(text) {
+      let favorites = getStorage('favorites');
+      if (favorites.includes(text)) favorites = favorites.filter(i => i !== text);
+      else favorites = [text, ...favorites].slice(0, 50);
+      setStorage('favorites', favorites);
+      renderHistory(searchInput.value);
     }
 
-    function toggleFavorite(captionText, btn) {
-        let favorites = getStorage('favorites');
-        if (favorites.includes(captionText)) {
-            favorites = favorites.filter(fav => fav !== captionText);
-            btn.classList.remove('favorited'); btn.innerHTML = '☆';
-        } else {
-            favorites.unshift(captionText);
-            btn.classList.add('favorited'); btn.innerHTML = '⭐';
-        }
-        setStorage('favorites', favorites);
-        renderHistory(searchInput.value);
-    }
-    
     function switchTab(activeTab, activeView) {
-        [textTab, imageTab, calendarTab, historyTab, settingsTab].forEach(tab => tab.classList.remove('active'));
-        [textView, imageView, calendarView, historyView, settingsView].forEach(view => view.classList.remove('active'));
-        activeTab.classList.add('active');
-        activeView.classList.add('active');
-        generationResultsContainer.innerHTML = '';
-        if (activeTab === historyTab) renderHistory(searchInput.value);
-        if (activeTab === calendarTab) loadCalendarFeatures();
-    }
-    
-    function performFetch(endpoint, payload, isImage = false) {
-        spinnerContainer.style.display = 'flex';
-        generationResultsContainer.innerHTML = '';
-        fetch(endpoint, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(payload)
-        })
-        .then(response => response.json())
-        .then(data => {
-            spinnerContainer.style.display = 'none';
-            if (isImage) {
-                if (data.image_url) {
-                    const card = document.createElement('div');
-                    card.id = 'image-result-card';
-                    card.innerHTML = `<img src="${data.image_url}" alt="Generated Image">`;
-                    generationResultsContainer.appendChild(card);
-                } else {
-                    generationResultsContainer.innerHTML = `<div class="result-card">${data.error || 'Error'}</div>`;
-                }
-            } else {
-                if (data.caption) {
-                    const newCaptions = data.caption.split(/\d+\./).filter(Boolean).map(s => s.trim());
-                    saveToHistory(newCaptions);
-                    const favorites = getStorage('favorites');
-                    newCaptions.forEach(cap => createResultCard(cap, favorites.includes(cap), generationResultsContainer));
-                } else {
-                    generationResultsContainer.innerHTML = `<div class="result-card">${data.error || 'Error'}</div>`;
-                }
-            }
-        })
-        .catch(error => {
-            spinnerContainer.style.display = 'none';
-            generationResultsContainer.innerHTML = '<div class="result-card">Network error.</div>';
-        });
-    }
-    
-    function loadCalendarFeatures() {
-        populateFavoritesSidebar();
-        renderCalendar();
+      [textTab, imageTab, calendarTab, historyTab, settingsTab].forEach(t => {
+        t.classList.remove('active'); t.setAttribute('aria-selected','false');
+      });
+      [textView, imageView, calendarView, historyView, settingsView].forEach(v => v.classList.remove('active'));
+      activeTab.classList.add('active'); activeTab.setAttribute('aria-selected','true');
+      activeView.classList.add('active');
+      generationResultsContainer.innerHTML = '';
+      if (activeTab === historyTab) renderHistory(searchInput.value);
+      if (activeTab === calendarTab) { populateFavoritesSidebar(); renderCalendar(); }
     }
 
-    function populateFavoritesSidebar() {
-        favoritesList.innerHTML = '';
-        const favorites = getStorage('favorites');
-        if (favorites.length === 0) {
-            favoritesList.innerHTML = '<p style="font-size: 13px; color: var(--text-secondary);">Δεν υπάρχουν αγαπημένα.</p>';
-            return;
+    // Networking
+    function handleResponseAuth(res) {
+      if (res.redirected || res.url.includes('/login')) { window.location.href = '/login'; return null; }
+      const ctype = res.headers.get('content-type') || '';
+      if (!ctype.includes('application/json')) { window.location.href = '/login'; return null; }
+      if (res.status === 401 || res.status === 403) { window.location.href = '/login'; return null; }
+      return res.json();
+    }
+
+    function splitNumberedList(text) {
+      const a = text.trim().split(/\n(?=\d+\.\s)/).map(t => t.replace(/^\d+\.\s*/, '').trim()).filter(Boolean);
+      if (a.length > 1) return a;
+      return text.split(/\n{2,}/).map(t => t.trim()).filter(Boolean);
+    }
+
+    function setBusy(b) {
+      spinnerContainer.style.display = b ? 'flex' : 'none';
+      spinnerContainer.setAttribute('aria-hidden', b ? 'false' : 'true');
+      [generateTextBtn, generateImageBtn, uploadBtn].forEach(x => { if (x) x.disabled = b; });
+    }
+
+    function renderImage(url, alt = 'Generated Image') {
+      const card = document.createElement('div'); card.id = 'image-result-card';
+      const img = document.createElement('img'); img.src = url; img.alt = alt;
+      card.appendChild(img);
+      generationResultsContainer.appendChild(card);
+    }
+
+    function performFetch(endpoint, payload, isImage=false) {
+      setBusy(true);
+      generationResultsContainer.innerHTML = '';
+      fetch(endpoint, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Accept': 'application/json',
+          'X-Requested-With': 'XMLHttpRequest'
+        },
+        body: JSON.stringify(payload)
+      })
+      .then(handleResponseAuth)
+      .then(data => {
+        if (!data) return;
+        setBusy(false);
+        if (isImage) {
+          if (data.image_url) renderImage(data.image_url);
+          else generationResultsContainer.innerHTML = `<div class="result-card">${data.error || 'Error'}</div>`;
+        } else {
+          if (data.caption) {
+            const list = splitNumberedList(data.caption);
+            saveToHistory(list);
+            const favs = getStorage('favorites');
+            list.forEach(c => createResultCard(c, favs.includes(c), generationResultsContainer));
+          } else {
+            generationResultsContainer.innerHTML = `<div class="result-card">${data.error || 'Error'}</div>`;
+          }
         }
-        favorites.forEach(text => {
-            const item = document.createElement('div');
-            item.className = 'favorite-item';
-            item.textContent = text;
-            item.draggable = true;
-            item.addEventListener('dragstart', (e) => {
-                e.dataTransfer.setData('text/plain', text);
-            });
-            favoritesList.appendChild(item);
-        });
+      })
+      .catch(() => {
+        setBusy(false);
+        generationResultsContainer.innerHTML = '<div class="result-card">Network error.</div>';
+      });
+    }
+
+    // Calendar
+    function populateFavoritesSidebar() {
+      favoritesList.innerHTML = '';
+      const favorites = getStorage('favorites');
+      if (favorites.length === 0) {
+        favoritesList.innerHTML = '<p style="font-size:13px;color:var(--text-secondary);">Δεν υπάρχουν αγαπημένα.</p>';
+        return;
+      }
+      favorites.forEach(text => {
+        const item = document.createElement('div');
+        item.className = 'favorite-item';
+        item.textContent = text;
+        item.draggable = true;
+        item.addEventListener('dragstart', e => e.dataTransfer.setData('text/plain', text));
+        favoritesList.appendChild(item);
+      });
     }
 
     function renderCalendar() {
-        calendarGrid.innerHTML = '';
-        const daysOfWeek = ['ΔΕ', 'ΤΡ', 'ΤΕ', 'ΠΕ', 'ΠΑ', 'ΣΑ', 'ΚΥ'];
-        daysOfWeek.forEach(day => {
-            const dayHeader = document.createElement('div');
-            dayHeader.className = 'calendar-day-header';
-            dayHeader.textContent = day;
-            calendarGrid.appendChild(dayHeader);
-        });
-
-        for (let i = 1; i <= 31; i++) {
-            const dayCell = document.createElement('div');
-            dayCell.className = 'calendar-day';
-            dayCell.dataset.day = i;
-            
-            const dayNumber = document.createElement('div');
-            dayNumber.className = 'day-number';
-            dayNumber.textContent = i;
-            dayCell.appendChild(dayNumber);
-
-            dayCell.addEventListener('dragover', (e) => { e.preventDefault(); dayCell.classList.add('drag-over'); });
-            dayCell.addEventListener('dragleave', () => { dayCell.classList.remove('drag-over'); });
-            dayCell.addEventListener('drop', (e) => {
-                e.preventDefault();
-                dayCell.classList.remove('drag-over');
-                const captionText = e.dataTransfer.getData('text/plain');
-                scheduleItem(i, captionText);
-            });
-            calendarGrid.appendChild(dayCell);
-        }
-        loadScheduledItems();
+      calendarGrid.innerHTML = '';
+      ['ΔΕ','ΤΡ','ΤΕ','ΠΕ','ΠΑ','ΣΑ','ΚΥ'].forEach(d => {
+        const h = document.createElement('div'); h.className='calendar-day-header'; h.textContent=d; calendarGrid.appendChild(h);
+      });
+      for (let i=1;i<=31;i++){
+        const cell = document.createElement('div'); cell.className='calendar-day'; cell.dataset.day=i;
+        const num = document.createElement('div'); num.className='day-number'; num.textContent=i; cell.appendChild(num);
+        cell.addEventListener('dragover', e => { e.preventDefault(); cell.classList.add('drag-over'); });
+        cell.addEventListener('dragleave', () => cell.classList.remove('drag-over'));
+        cell.addEventListener('drop', e => { e.preventDefault(); cell.classList.remove('drag-over'); scheduleItem(i, e.dataTransfer.getData('text/plain')); });
+        calendarGrid.appendChild(cell);
+      }
+      loadScheduledItems();
     }
 
     function scheduleItem(day, text) {
-        let schedule = getStorage('schedule') || {};
-        if (!schedule[day]) schedule[day] = [];
-        if (schedule[day].includes(text)) return;
-        schedule[day].push(text);
-        setStorage('schedule', schedule);
-        loadScheduledItems();
-    }
-    
-    function loadScheduledItems() {
-        const schedule = getStorage('schedule') || {};
-        document.querySelectorAll('.scheduled-item').forEach(item => item.remove());
-        for (const day in schedule) {
-            const dayCell = document.querySelector(`.calendar-day[data-day='${day}']`);
-            if (dayCell) {
-                schedule[day].forEach(text => {
-                    const scheduledItem = document.createElement('div');
-                    scheduledItem.className = 'scheduled-item';
-                    scheduledItem.textContent = text;
-                    dayCell.appendChild(scheduledItem);
-                });
-            }
-        }
+      let schedule = JSON.parse(localStorage.getItem('schedule') || '{}');
+      if (!schedule[day]) schedule[day] = [];
+      if (!schedule[day].includes(text)) schedule[day].push(text);
+      localStorage.setItem('schedule', JSON.stringify(schedule));
+      loadScheduledItems();
     }
 
-    // --- ΒΗΜΑ 3: ΟΛΟΙ ΟΙ EVENT LISTENERS ΣΤΟ ΤΕΛΟΣ ---
+    function loadScheduledItems() {
+      const schedule = JSON.parse(localStorage.getItem('schedule') || '{}');
+      document.querySelectorAll('.scheduled-item').forEach(i => i.remove());
+      for (const day in schedule) {
+        const cell = document.querySelector(`.calendar-day[data-day='${day}']`);
+        if (!cell) continue;
+        schedule[day].forEach(text => {
+          const el = document.createElement('div');
+          el.className='scheduled-item';
+          el.textContent=text;
+          cell.appendChild(el);
+        });
+      }
+    }
+
+    // Events
     textTab.addEventListener('click', () => switchTab(textTab, textView));
     imageTab.addEventListener('click', () => switchTab(imageTab, imageView));
     calendarTab.addEventListener('click', () => switchTab(calendarTab, calendarView));
     historyTab.addEventListener('click', () => switchTab(historyTab, historyView));
     settingsTab.addEventListener('click', () => switchTab(settingsTab, settingsView));
 
-    historySubTab.addEventListener('click', () => { currentHistoryView = 'history'; historySubTab.classList.add('active'); favoritesSubTab.classList.remove('active'); renderHistory(searchInput.value); });
-    favoritesSubTab.addEventListener('click', () => { currentHistoryView = 'favorites'; favoritesSubTab.classList.add('active'); historySubTab.classList.remove('active'); renderHistory(searchInput.value); });
+    historySubTab.addEventListener('click', () => {
+      currentHistoryView = 'history';
+      historySubTab.classList.add('active'); favoritesSubTab.classList.remove('active');
+      historySubTab.setAttribute('aria-selected','true'); favoritesSubTab.setAttribute('aria-selected','false');
+      renderHistory(searchInput.value);
+    });
+    favoritesSubTab.addEventListener('click', () => {
+      currentHistoryView = 'favorites';
+      favoritesSubTab.classList.add('active'); historySubTab.classList.remove('active');
+      favoritesSubTab.setAttribute('aria-selected','true'); historySubTab.setAttribute('aria-selected','false');
+      renderHistory(searchInput.value);
+    });
 
     generateTextBtn.addEventListener('click', () => {
-        const topic = document.getElementById('topic-input').value;
-        if (!topic) return alert('Παρακαλώ, γράψε ένα θέμα!');
-        const brandVoice = localStorage.getItem('brandVoice') || '';
-        const payload = {
-            topic: topic,
-            keywords: document.getElementById('keywords').value,
-            platform: document.getElementById('platform-select').value,
-            contentType: document.getElementById('content-type-select').value,
-            tone: document.getElementById('tone-select').value,
-            language: document.getElementById('language-select').value,
-            model_choice: document.getElementById('model-select').value,
-            brand_voice: brandVoice
-        };
-        performFetch('/generate-caption', payload, false);
+      const topic = document.getElementById('topic-input').value;
+      if (!topic) return alert('Παρακαλώ, γράψε ένα θέμα!');
+      const payload = {
+        topic,
+        keywords: document.getElementById('keywords').value,
+        platform: document.getElementById('platform-select').value,
+        contentType: document.getElementById('content-type-select').value,
+        tone: document.getElementById('tone-select').value,
+        language: document.getElementById('language-select').value,
+        model_choice: document.getElementById('model-select').value,
+        brand_voice: localStorage.getItem('brandVoice') || ''
+      };
+      performFetch('/generate-caption', payload, false);
     });
 
     generateImageBtn.addEventListener('click', () => {
-        const prompt = document.getElementById('image-prompt-input').value;
-        if (!prompt) return alert('Παρακαλώ, δώσε μια περιγραφή για την εικόνα!');
-        const payload = {
-            prompt: prompt,
-            style: document.getElementById('image-style-select').value
-        };
-        performFetch('/generate-image', payload, true);
+      const prompt = document.getElementById('image-prompt-input').value;
+      if (!prompt) return alert('Παρακαλώ, δώσε μια περιγραφή για την εικόνα!');
+      const payload = { prompt, style: document.getElementById('image-style-select').value };
+      performFetch('/generate-image', payload, true);
     });
 
     uploadBtn.addEventListener('click', () => {
-        const file = fileInput.files[0];
-        if (!file) return alert('Παρακαλώ, επίλεξε πρώτα ένα αρχείο!');
-        const formData = new FormData();
-        formData.append('file', file);
-        spinnerContainer.style.display = 'flex';
-        generationResultsContainer.innerHTML = '';
-        fetch('/upload-image', { method: 'POST', body: formData })
-        .then(response => response.json())
-        .then(data => {
-            spinnerContainer.style.display = 'none';
-            if (data.image_url) {
-                const card = document.createElement('div');
-                card.id = 'image-result-card';
-                card.innerHTML = `<img src="${data.image_url}" alt="Uploaded Image"><button class="analyze-btn">Ανάλυση Εικόνας με AI</button>`;
-                generationResultsContainer.appendChild(card);
-                
-                // Add event listener to the newly created button
-                card.querySelector('.analyze-btn').onclick = () => analyzeImageWithAI(data.image_url);
-            } else {
-                generationResultsContainer.innerHTML = `<div class="result-card">${data.error || 'Error'}</div>`;
-            }
-        })
-        .catch(error => {
-            spinnerContainer.style.display = 'none';
-            generationResultsContainer.innerHTML = '<div class="result-card">Network error.</div>';
-        });
+      const file = fileInput?.files?.[0];
+      if (!file) return alert('Παρακαλώ, επίλεξε πρώτα ένα αρχείο!');
+      const form = new FormData(); form.append('file', file);
+      setBusy(true); generationResultsContainer.innerHTML = '';
+      fetch('/upload-image', {
+        method: 'POST',
+        body: form,
+        headers: { 'Accept': 'application/json', 'X-Requested-With': 'XMLHttpRequest' }
+      })
+      .then(handleResponseAuth)
+      .then(data => {
+        if (!data) return;
+        setBusy(false);
+        if (data.image_url) {
+          const card = document.createElement('div'); card.id='image-result-card';
+          const img = document.createElement('img'); img.src=data.image_url; img.alt='Uploaded Image';
+          const btn = document.createElement('button'); btn.type='button'; btn.className='analyze-btn'; btn.textContent='Ανάλυση Εικόνας με AI';
+          btn.addEventListener('click', () => analyzeImageWithAI(data.image_url));
+          card.appendChild(img); card.appendChild(btn);
+          generationResultsContainer.appendChild(card);
+        } else generationResultsContainer.innerHTML = `<div class="result-card">${data.error || 'Error'}</div>`;
+      })
+      .catch(() => { setBusy(false); generationResultsContainer.innerHTML='<div class="result-card">Network error.</div>'; });
     });
 
-    function analyzeImageWithAI(imageUrl) {
-        spinnerContainer.style.display = 'flex';
-        fetch('/analyze-image', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ image_url: imageUrl })
-        })
-        .then(response => response.json())
-        .then(data => {
-            spinnerContainer.style.display = 'none';
-            if (data.description) {
-                document.getElementById('topic-input').value = data.description;
-                textTab.click();
-                alert('Η ανάλυση της εικόνας ολοκληρώθηκε! Η περιγραφή προστέθηκε στο "Κύριο Θέμα".');
-            } else {
-                alert(data.error || 'Η ανάλυση απέτυχε.');
-            }
-        })
-        .catch(error => {
-            spinnerContainer.style.display = 'none';
-            alert('Παρουσιάστηκε σφάλμα δικτύου κατά την ανάλυση.');
-        });
+    function analyzeImageWithAI(url) {
+      setBusy(true);
+      fetch('/analyze-image', {
+        method: 'POST',
+        headers: { 'Content-Type':'application/json','Accept':'application/json','X-Requested-With':'XMLHttpRequest' },
+        body: JSON.stringify({ image_url: url })
+      })
+      .then(handleResponseAuth)
+      .then(data => {
+        if (!data) return; setBusy(false);
+        if (data.description) {
+          document.getElementById('topic-input').value = data.description;
+          textTab.click();
+          alert('Η ανάλυση ολοκληρώθηκε! Η περιγραφή προστέθηκε στο "Κύριο Θέμα".');
+        } else alert(data.error || 'Η ανάλυση απέτυχε.');
+      })
+      .catch(() => { setBusy(false); alert('Σφάλμα δικτύου κατά την ανάλυση.'); });
     }
 
     saveSettingsBtn.addEventListener('click', () => {
-        const brandVoice = brandVoiceInput.value;
-        localStorage.setItem('brandVoice', brandVoice);
-        saveSettingsBtn.textContent = 'Αποθηκεύτηκε!';
-        setTimeout(() => { saveSettingsBtn.textContent = 'Αποθήκευση Ρυθμίσεων'; }, 2000);
+      localStorage.setItem('brandVoice', brandVoiceInput.value || '');
+      saveSettingsBtn.textContent = 'Αποθηκεύτηκε!';
+      setTimeout(() => saveSettingsBtn.textContent = 'Αποθήκευση Ρυθμίσεων', 2000);
     });
-    
+
+    searchInput.addEventListener('input', e => renderHistory(e.target.value));
+
     themeSwitch.addEventListener('click', () => {
-        document.body.classList.toggle('dark-mode');
-        if (document.body.classList.contains('dark-mode')) {
-            localStorage.setItem('theme', 'dark');
-            themeSwitch.textContent = '☀️';
-        } else {
-            localStorage.setItem('theme', 'light');
-            themeSwitch.textContent = '🌙';
-        }
+      const dark = document.body.classList.toggle('dark-mode');
+      localStorage.setItem('theme', dark ? 'dark' : 'light');
+      themeSwitch.textContent = dark ? '☀️' : '🌙';
+      themeSwitch.setAttribute('aria-pressed', dark ? 'true' : 'false');
     });
-    
-    searchInput.addEventListener('input', (e) => renderHistory(e.target.value));
-    
+
+    // On load
     document.addEventListener('DOMContentLoaded', () => {
-        if (localStorage.getItem('theme') === 'dark') {
-            document.body.classList.add('dark-mode');
-            themeSwitch.textContent = '☀️';
-        }
-        const savedBrandVoice = localStorage.getItem('brandVoice') || '';
-        brandVoiceInput.value = savedBrandVoice;
-        textTab.click();
+      if (localStorage.getItem('theme') === 'dark') {
+        document.body.classList.add('dark-mode');
+        themeSwitch.textContent = '☀️';
+        themeSwitch.setAttribute('aria-pressed','true');
+      }
+      brandVoiceInput.value = localStorage.getItem('brandVoice') || '';
+      textTab.click(); // ενεργοποίηση default tab
     });
-    </script>
+  </script>
 </body>
 </html>
